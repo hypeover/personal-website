@@ -2,7 +2,7 @@
 
 import { Resend } from "resend";
 
-const resend = new Resend("re_SprwRTdz_21NUDQStScnp7wSpnDd7SGaP");
+const resend = new Resend(process.env.RESEND_API);
 
 interface EmailContent {
   author: string,

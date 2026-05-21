@@ -3,7 +3,9 @@ import IconsDock from "@/components/home/dock-items/icons-dock";
 import GitHubContributionsDemo from "@/components/home/home-items/github-repo";
 import ThemeToggle from "@/components/home/home-items/mode-toggle";
 import Tech from "@/components/home/tech/tech";
-import Footer from "@/components/home/home-items/footer";
+import ExperienceTimeline from "@/components/home/accordion/accordion-experience";
+import ProjectsTimeline from "@/components/home/accordion/accordion-projects";
+import EducationTimeline from "@/components/home/accordion/accordion-education";
 
 const Page = () => {
   return (
@@ -11,7 +13,7 @@ const Page = () => {
       <div className="fixed bottom-5 left-5 z-50">
         <ThemeToggle />
       </div>
-      <div className="flex flex-col h-200 w-200 mt-30">
+      <div className="flex flex-col h-400 w-200 mt-30">
         <h1 className="text-4xl font-mono tracking-wider font-medium">
           Krystian Rdzonkowski
         </h1>
@@ -21,6 +23,9 @@ const Page = () => {
         </div>
         <GitHubContributionsDemo />
         <Tech />
+        <ExperienceTimeline />
+        <ProjectsTimeline />
+        <EducationTimeline />
       </div>
     </div>
   );
