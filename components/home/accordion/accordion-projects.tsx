@@ -33,7 +33,7 @@ const projects = [
 
 const ProjectsTimeline = () => {
   return (
-    <div className="w-full h-auto flex flex-col">
+    <div className="w-full h-auto flex flex-col mt-5">
       {projects.map((project, index) => {
         return (
           <div key={index} className="flex flex-row gap-4 mb-5">

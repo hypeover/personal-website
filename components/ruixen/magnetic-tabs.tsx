@@ -121,7 +121,7 @@ export function MagneticTabs({
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const barRef = useRef<HTMLDivElement | null>(null);
   const measured = useRef(false);
-  const selectTimer = useRef<ReturnType<typeof setTimeout>>();
+  const selectTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const pillX = useMotionValue(0);
   const pillW = useMotionValue(0);
