@@ -28,10 +28,10 @@ export default function ScrollToHide() {
       initial={{ opacity: 0, y: 30}} 
       animate={isVisible ? { opacity: 1, y: -20} : { opacity: 0, y: 30}}
       transition={{ duration: 0.6, ease: easeOut }} 
-      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 p-4 backdrop-blur-md bg-muted rounded-2xl flex flex-col"
+      className="fixed bottom-1 left-1/2 -translate-x-1/2 z-50 flex flex-col"
     >
-      <div className="flex flex-row" >Built by<p className="underline ml-1">Krystian Rdzonkowski</p>. The source code is available on <a className="underline ml-1" href="https://github.com/hypeover/personal-website">Github</a>.</div>
-      <p className="w-full text-center" >Thanks for visiting my portfolio.</p>
+      <div className="flex flex-row select-none" >Built by<p className="select-none underline ml-1">Krystian Rdzonkowski</p>. The source code is available on <a target="_blank" className="select-none underline ml-1" href="https://github.com/hypeover/personal-website">Github</a>.</div>
+      <p className="w-full text-center select-none" >Thanks for visiting my portfolio.</p>
     </motion.div>
   );
 }

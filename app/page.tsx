@@ -4,7 +4,7 @@ import IconsDock from "@/components/home/dock-items/icons-dock";
 import GitHubContributionsDemo from "@/components/home/home-items/github-repo";
 import ThemeToggle from "@/components/home/home-items/mode-toggle";
 import Tech from "@/components/home/tech/tech";
-import Accordion from "@/components/home/accordion/test";
+import Accordion from "@/components/home/accordion/accordion";
 import "lenis/dist/lenis.css";
 import { ReactLenis } from "lenis/react";
 import Header from "@/components/home/header";
@@ -40,6 +40,7 @@ const Page = () => {
           <Tech />
         </div>
         <Accordion />
+        <ScrollToHide />
       </main>
     </>
   );

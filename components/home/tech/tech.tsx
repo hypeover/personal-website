@@ -29,7 +29,7 @@ const Tech = () => {
       transition={{ duration: 1, ease: easeOut, delay: 0.8 }}
       className="mt-4"
     >
-      <p className="font-medium text-2xl">Tech stack:</p>
+      <p className="text-3xl pt-4 mb-2 font-medium">Stack:</p>
       <div
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
