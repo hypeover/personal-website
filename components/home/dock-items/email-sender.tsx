@@ -65,7 +65,7 @@ function EmailSender({ isOpen, setIsOpen }: EmailSenderProps) {
               initial="hidden"
               animate="show"
               exit="exit"
-              className="relative w-full max-w-[480px] overflow-hidden rounded-3xl bg-white p-6 shadow-2xl dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-900 ring-1 ring-zinc-950/5"
+              className="relative w-full max-w-120 overflow-hidden rounded-3xl bg-white p-6 shadow-2xl dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-900 ring-1 ring-zinc-950/5"
             >
               <div className="absolute right-6 top-6">
                 <button
@@ -150,6 +150,7 @@ function EmailSender({ isOpen, setIsOpen }: EmailSenderProps) {
                     setEmail({ author: "", content: "", subject: "" })
                   }
                   type="button"
+                  className="cursor-pointer"
                 >
                   <Eraser />
                 </Button>

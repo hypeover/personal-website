@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useTheme } from "next-themes";
-import { motion } from "motion/react";
+import { easeOut, motion } from "motion/react";
 import { flushSync } from "react-dom";
 
 const ThemeToggle = () => {
@@ -27,18 +27,21 @@ const ThemeToggle = () => {
     await transition.ready;
 
     document.documentElement.animate(
-      { opacity: [0, 1] }, 
+      { opacity: [0, 1] },
       {
         duration: 400,
         easing: "cubic-bezier(0.71, 0, 0.3, 1)",
         pseudoElement: "::view-transition-new(root)",
         fill: "both",
-      }
+      },
     );
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1, ease: easeOut, delay: 1 }}
       className="relative h-8 overflow-hidden cursor-pointer w-auto"
       onClick={toggleTheme}
     >
@@ -57,7 +60,7 @@ const ThemeToggle = () => {
           Dark
         </div>
       </motion.div>
-    </div>
+    </motion.div>
   );
 };
 

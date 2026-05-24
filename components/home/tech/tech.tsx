@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { TechList } from "./tech-list";
 import { IosPointer, MagneticItem } from "@/components/cursor/CursorComponents";
 import { CursorProvider } from "@/components/cursor/CursorContext";
+import { easeOut, motion } from "motion/react";
 
 const Tech = () => {
   const [isInZone, setIsInZone] = useState(false);
@@ -22,8 +23,13 @@ const Tech = () => {
   };
 
   return (
-    <div className="mt-4" >
-      <p className="font-medium text-2xl" >Tech stack:</p>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1, ease: easeOut, delay: 0.8 }}
+      className="mt-4"
+    >
+      <p className="font-medium text-2xl">Tech stack:</p>
       <div
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -53,7 +59,7 @@ const Tech = () => {
           </div>
         </CursorProvider>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

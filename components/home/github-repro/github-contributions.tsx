@@ -20,6 +20,7 @@ import {
   ContributionGraphLegend,
   ContributionGraphTotalCount,
 } from "@/components/home/github-repro/contribution-graph"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export function GitHubContributions({
   contributions,
@@ -92,8 +93,6 @@ export function GitHubContributions({
 
 export function GitHubContributionsFallback() {
   return (
-    <div className="flex h-40.5 w-full items-center justify-center">
-      <Spinner className="text-muted-foreground" />
-    </div>
+    <Skeleton className="w-full h-[160px] mt-2" />
   )
 }

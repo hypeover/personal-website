@@ -1,11 +1,15 @@
+"use client";
 import CvButton from "@/components/home/home-items/cv-button";
 import IconsDock from "@/components/home/dock-items/icons-dock";
 import GitHubContributionsDemo from "@/components/home/home-items/github-repo";
 import ThemeToggle from "@/components/home/home-items/mode-toggle";
 import Tech from "@/components/home/tech/tech";
-import Accordion from "@/components/home/accordion/accordion";
+import Accordion from "@/components/home/accordion/test";
 import "lenis/dist/lenis.css";
 import { ReactLenis } from "lenis/react";
+import Header from "@/components/home/header";
+import ScrollToHide from "@/components/home/footer";
+import { easeOut, motion } from "motion/react";
 
 const Page = () => {
   return (
@@ -15,15 +19,24 @@ const Page = () => {
         <div className="fixed bottom-5 left-5">
           <ThemeToggle />
         </div>
-        <div className="flex flex-col w-full max-w-3xl mt-16 px-4">
-          <h1 className="text-4xl font-mono tracking-wider font-medium">
-            Krystian Rdzonkowski
-          </h1>
-          <div className="flex flex-row my-5 gap-4 items-center">
+        <div className="flex flex-col w-full max-w-3xl h-screen px-4 justify-end pb-8">
+          <Header />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, ease: easeOut, delay: 0.4 }}
+            className="flex flex-row my-5 gap-2 items-center"
+          >
             <CvButton />
             <IconsDock />
-          </div>
-          <GitHubContributionsDemo />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, ease: easeOut, delay: 0.6 }}
+          >
+            <GitHubContributionsDemo />
+          </motion.div>
           <Tech />
         </div>
         <Accordion />
