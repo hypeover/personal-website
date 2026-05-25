@@ -7,7 +7,7 @@ const certifications = [
 
 const languages = [
   "Polish - Native",
-  "English - B1 (comfortable reading technical documentation)",
+  "English - B2",
 ];
 
 const EducationTimeline = () => {
