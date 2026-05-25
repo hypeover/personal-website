@@ -22,11 +22,11 @@ const IconsDock = () => {
     <>
     <div className="flex flex-col items-center justify-center">
       <TooltipProvider>
-        <Dock direction="middle" className="mt-0  py-0">
+        <Dock direction="middle" className="mt-0  py-6">
           <DockIcon>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <a target='_blank' href="https://github.com/hypeover" className="color-primary"><GitHubIcon className="h-5 w-5" /></a>
+                  <a target='_blank' href="https://github.com/hypeover" className="color-primary"><GitHubIcon className="h-6 w-6" /></a>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>GitHub</p>
@@ -36,7 +36,7 @@ const IconsDock = () => {
             <DockIcon>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <a target='_blank' href="https://www.linkedin.com/in/krystian-r-256975204/" className="color-primary"><LinkedInIcon className="h-5 w-5" /></a>
+                  <a target='_blank' href="https://www.linkedin.com/in/krystian-r-256975204/" className="color-primary"><LinkedInIcon className="h-6 w-6" /></a>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>LinkedIn</p>
@@ -46,7 +46,7 @@ const IconsDock = () => {
             <DockIcon>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <a className="color-primary" onClick={() => setIsOpen(true)}><MailIcon /></a>
+                  <a className="color-primary" onClick={() => setIsOpen(true)}><MailIcon className="h-6.5 w-6.5" /></a>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Send Email</p>

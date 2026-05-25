@@ -7,7 +7,6 @@ import { motion } from "motion/react";
 
 const sections = [
   {
-    title: "Experience:",
     content: (
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -20,7 +19,6 @@ const sections = [
     ),
   },
   {
-    title: "Projects:",
     content: (
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -33,7 +31,6 @@ const sections = [
     ),
   },
   {
-    title: "Education:",
     content: (
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -55,7 +52,7 @@ const sections = [
 
 const Accordion = () => {
   return (
-    <main>
+    <main className="w-full" >
       <section className="w-full">
         {sections.map((section, i) => {
           const isLast = i === sections.length - 1;
@@ -63,9 +60,7 @@ const Accordion = () => {
 
           return (
             <figure
-              className={`bg-background sticky h-auto px-4 ${
-                isLast ? "w-full" : "max-w-3xl mx-auto"
-              }`}
+              className={`bg-background sticky h-auto`}
               key={i}
               style={{
                 top: `${topOffset}px`,
@@ -74,9 +69,7 @@ const Accordion = () => {
             >
               <div className="relative w-full h-full">
                 <div>
-                  {section.title && (
-                    <p className="text-3xl pt-4 mb-4 font-medium">{section.title}</p>
-                  )}
+                 
 
                   <div
                     className={

@@ -42,7 +42,7 @@ const ThemeToggle = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1, ease: easeOut, delay: 1 }}
-      className="relative h-8 overflow-hidden cursor-pointer w-auto"
+      className="relative h-8 overflow-hidden cursor-pointer w-auto z-9999"
       onClick={toggleTheme}
     >
       <motion.div

@@ -141,3 +141,7 @@
 ::view-transition-new(root) {
   z-index: 999;
 }
+
+.swiper-wrapper {
+  transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1) !important;
+}

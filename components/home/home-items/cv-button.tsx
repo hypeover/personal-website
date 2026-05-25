@@ -7,11 +7,11 @@ const CvButton = () => {
     <a href="/Krystian_Rdzonkowski_Resume.pdf" target="_blank" className="mr-3">
       <Button
         size="lg"
-        className="text-lg py-5 px-4 box-border cursor-pointer text-md rounded-xl"
+        className="text-lg py-6 px-4 box-border cursor-pointer rounded-xl"
         data-icon="inline-start"
         
       >
-        <FileSpreadsheet size={36} />
+        <FileSpreadsheet className="h-7 w-7" />
         Download CV
       </Button>
     </a>

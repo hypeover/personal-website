@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useCursor } from "./CursorContext";
 
 interface IosPointerProps {
@@ -12,15 +12,12 @@ interface IosPointerProps {
 export function IosPointer({ isVisible, initialCoords }: IosPointerProps) {
   const { isHovered, elementRect } = useCursor();
   
-  // Startujemy domyślnie z 0, ale zaraz to nadpiszemy
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
   const smoothX = useSpring(mouseX, { damping: 22, stiffness: 350 });
   const smoothY = useSpring(mouseY, { damping: 22, stiffness: 350 });
 
-  // KLUCZ: Gdy pojawiają się współrzędne startowe, natychmiast ustawiamy 
-  // wartości bez animacji (funkcja .jump() omija efekt sprężyny useSpring!)
   useEffect(() => {
     if (initialCoords) {
       smoothX.jump(initialCoords.x);
@@ -48,7 +45,6 @@ export function IosPointer({ isVisible, initialCoords }: IosPointerProps) {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isHovered, elementRect, mouseX, mouseY, isVisible]);
 
-  // Warianty wyglądu kursora
   const pointerVariants = {
     default: {
       width: 16,
@@ -66,7 +62,6 @@ export function IosPointer({ isVisible, initialCoords }: IosPointerProps) {
     },
   };
 
-  // Jeśli kursor ma być niewidoczny, zwracamy null, żeby nie wisiał na ekranie
   if (!isVisible) return null;
 
   return (
@@ -80,7 +75,6 @@ export function IosPointer({ isVisible, initialCoords }: IosPointerProps) {
   );
 }
 
-// --- WRAPPER DLA ELEMENTÓW W .MAP() ---
 export function MagneticItem({ children }: { children: React.ReactNode }) {
   const { registerHover, unregisterHover } = useCursor();
   const elementRef = useRef<HTMLDivElement>(null);

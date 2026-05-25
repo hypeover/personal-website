@@ -42,12 +42,12 @@ const CopyButton = ({ content, iconSize = 20, className, ...props }: CopyButtonP
       {isCopied ? (
         <CheckIcon
           size={iconSize}
-          className="animate-in zoom-in-50 text-green-900 duration-200 dark:text-green-400"
+          className="animate-in zoom-in-50 text-green-900 duration-200 dark:text-green-400 h-6 w-6"
         />
       ) : (
         <AtSign
           size={iconSize}
-          className="animate-in zoom-in-50 duration-200"
+          className="animate-in zoom-in-50 duration-200 h-6 w-6"
         />
       )}
     </button>

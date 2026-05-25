@@ -24,5 +24,3 @@ const Tabs = () => {
 export default Tabs
 
 
-
-//https://www.ruixen.com/docs/components/magnetic-tabs

@@ -29,11 +29,11 @@ const Tech = () => {
       transition={{ duration: 1, ease: easeOut, delay: 0.8 }}
       className="mt-4"
     >
-      <p className="text-3xl pt-4 mb-2 font-medium">Stack:</p>
+      <p className="text-3xl pt-0 lg:pt-4 mb-2 font-medium">Stack:</p>
       <div
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="w-full max-w-4xl mt-2 p-2 bg-background rounded-xl  transition-all [@media(pointer:fine)]:hover:cursor-none"
+        className="w-full max-w-4xl mt-2 p-2 bg-background rounded-xl  transition-all pointer-fine:hover:cursor-none"
       >
         <CursorProvider>
           <IosPointer isVisible={isInZone} initialCoords={initialCoords} />
@@ -46,9 +46,9 @@ const Tech = () => {
                 <MagneticItem key={key}>
                   <a target="_blank" href={item.link}>
                     <div className="cursor-none flex flex-row items-center gap-2 justify-center py-2 px-4 bg-primary-foreground rounded-lg text-center">
-                      <IconComponent size={16} />
+                      <IconComponent size={18} />
 
-                      <div className="font-medium text-popover-foreground text-sm">
+                      <div className="font-medium text-popover-foreground text-sm lg:text-base">
                         {item.name}
                       </div>
                     </div>

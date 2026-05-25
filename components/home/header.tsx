@@ -2,9 +2,9 @@ import { easeOut, motion } from "motion/react";
 
 const Header = () => {
   return (
-    <div>
+    <div className="mt-10">
       <motion.h1
-        className="text-4xl mb-8 font-mono tracking-wide font-medium"
+        className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl sm:mb-8 font-mono tracking-wide font-medium"
         initial={{ opacity: 0}}
         animate={{ opacity: 1}}
         transition={{ duration: 1, ease: easeOut }}
@@ -15,7 +15,7 @@ const Header = () => {
         initial={{ opacity: 0}}
         animate={{ opacity: 1}}
         transition={{ duration: 1, ease: easeOut, delay: 0.2 }}
-        className="text-md mt-3 text-muted-foreground"
+        className="text-sm sm:text-lg md:text-base lg:text-lg mt-3 text-muted-foreground"
       >
         Currently working as a QA Tester, I am actively expanding my skills
         toward Frontend Development and Data Engineering. My main passion lies

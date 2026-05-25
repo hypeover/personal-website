@@ -2,8 +2,6 @@
 
 import { format } from "date-fns"
 import { use } from "react"
-
-import { Spinner } from "@/components/ui/spinner"
 import {
   Tooltip,
   TooltipContent,
@@ -41,7 +39,7 @@ export function GitHubContributions({
       blockRadius={2}
     >
       <ContributionGraphCalendar
-        className="no-scrollbar px-2"
+        className="no-scrollbar px-2 text-base"
         title="GitHub Contributions"
       >
         {({ activity, dayIndex, weekIndex }) => (
@@ -56,7 +54,7 @@ export function GitHubContributions({
                 />
               </g>
             </TooltipTrigger>
-            <TooltipContent className="font-sans">
+            <TooltipContent className="font-sans text-sm">
               <p>
                 {activity.count} contribution{activity.count > 1 ? "s" : null}{" "}
                 on {format(new Date(activity.date), "dd.MM.yyyy")}
@@ -67,10 +65,10 @@ export function GitHubContributions({
         )}
       </ContributionGraphCalendar>
 
-      <ContributionGraphFooter className="px-2">
+      <ContributionGraphFooter className="px-2 text-base">
         <ContributionGraphTotalCount>
           {({ totalCount, year }) => (
-            <div className="text-muted-foreground">
+            <div className="text-muted-foreground  ">
               {totalCount.toLocaleString("en")} contributions in {year} on{" "}
               <a
                 className="text-foreground link-underline"

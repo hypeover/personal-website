@@ -4,6 +4,12 @@ import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/mousewheel";
+import { Mousewheel, Navigation } from "swiper/modules";
+import 'swiper/css/navigation';
+
 const photos = [
   {
     title: "Moldova, 2024",
@@ -21,44 +27,62 @@ const photos = [
     title: "Romania, 2025",
     url: "/DSCF4299.jpg",
   },
+  {
+    title: "Italy, 2025",
+    url: "/DSCF3063.jpg",
+  },
+  {
+    title: "Romania, 2025",
+    url: "/DSCF4236.jpg",
+  },
 ];
 
 const AccordionPhotos = () => {
   return (
-    <div className="h-screen flex flex-col">
-      <div className="w-full h-auto pt-15 flex gap-5">
+    <div className="h-screen w-full pl-10 pr-9 pt-15">
+      <Swiper
+        className="w-full"
+        spaceBetween={40}
+        slidesPerView="auto"
+        speed={800}
+        mousewheel={{
+          enabled: true,
+          releaseOnEdges: true,
+          sensitivity: 1,
+        }}
+        loop={true}
+        modules={[Mousewheel]}
+      >
         {photos.map((photo, i) => {
           return (
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 2, ease: "easeOut", delay: i * 0.15 }}
-              key={i}
-              className="w-100 h-140 shadow-md relative "
-            >
-              <Image
-                className="grayscale hover:filter-none duration-300 w-full h-full"
-                alt="photo"
-                src={photo.url}
-                width={0}
-                height={0}
-                sizes="100vw"
-              />
-              <p className="mt-2 font-medium">{photo.title}</p>
-            </motion.div>
+            <SwiperSlide className="max-w-100" key={i}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 2, ease: "easeOut", delay: i * 0.15 }}
+                key={i}
+                className="w-100 h-150 flex flex-col"
+              >
+                <div className="w-100 h-140 overflow-hidden">
+                  <Image
+                    className="grayscale hover:filter-none duration-300 w-full h-full object-cover shadow-md"
+                    alt={photo.title}
+                    loading="eager"
+                    src={photo.url}
+                    width={500}
+                    height={700}
+                  />
+                </div>
+                <p className="mt-2 font-medium">{photo.title}</p>
+              </motion.div>
+            </SwiperSlide>
           );
         })}
-      </div>
-      <div className="text-center mt-15">
-        <Link href="/photos">
-          <Button className="text-lg py-5 px-4 box-border cursor-pointer text-md rounded-xl">
-            Check my photography...
-          </Button>
-        </Link>
-      </div>
+      </Swiper>
     </div>
   );
 };
 
 export default AccordionPhotos;
+

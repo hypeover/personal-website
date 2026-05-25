@@ -170,9 +170,3 @@ function EmailSender({ isOpen, setIsOpen }: EmailSenderProps) {
 }
 
 export { EmailSender, type EmailSenderProps };
-
-//https://www.prompt-kit.com/docs/prompt-input?utm_source=shoogle.dev&utm_medium=referral&utm_campaign=search
-
-//https://dribbble.com/shots/17197476-Crew-work-Email-composer
-//https://dribbble.com/shots/23241439-Email-Composer-AI-Style-kit
-//https://dribbble.com/shots/26083118-Create-email-inbox-composition
