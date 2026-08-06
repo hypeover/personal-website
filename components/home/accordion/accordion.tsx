@@ -9,8 +9,8 @@ const sections = [
   {
     content: (
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
@@ -57,13 +57,18 @@ const Accordion = () => {
         {sections.map((section, i) => {
           const isLast = i === sections.length - 1;
           const topOffset = i * 0;
+          // Experience (i === 0) stays in normal flow so its own job
+          // cards can drive their own sticky stacking underneath it;
+          // nesting sticky inside an already-stuck sticky ancestor
+          // freezes the inner sticky instead of letting it stack.
+          const isPinned = i !== 0;
 
           return (
             <figure
-              className={`bg-background sticky h-auto`}
+              className={`bg-background h-auto ${isPinned ? "sticky" : "relative"}`}
               key={i}
               style={{
-                top: `${topOffset}px`,
+                top: isPinned ? `${topOffset}px` : undefined,
                 zIndex: i,
               }}
             >
