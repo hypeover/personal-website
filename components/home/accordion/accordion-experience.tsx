@@ -2,19 +2,34 @@ import { Briefcase, Dot } from "lucide-react";
 
 const jobs = [
   {
-    name: "QA Tester",
+    name: "QA Game Tester",
     company: "Lionbridge",
     location: "Warsaw, Poland",
-    date: "Sep 2022 - Present",
+    date: "Sep 2022 - Jul 2026",
     details: [
-      "Manual Testing: executing functional, regression, exploratory and usability tests.",
-      "Test Documentation: creating and maintaining test plans, test cases, checklists and bug reports.",
-      "API Testing: performing CRUD operations, validating JSON structures and checking HTTP responses.",
-      "Mobile Testing: testing applications on iOS and Android devices.",
-      "Console Game Testing: conducting certification testing for console games.",
-      "Collaboration & Issue Management: coordinating with teams and managing defect triage.",
+      "Manual & Exploratory Testing: running functional, regression, and exploratory tests to check core game mechanics and ensure software logic matches design goals.",
+      "Cross-Platform Testing: testing UI, stability, and performance of a major AAA multiplayer title across PC, consoles, and mobile devices.",
+      "Multiplayer & Network Testing: verifying game logic, network connectivity, and real-time synchronization in a heavy-traffic multiplayer environment.",
+      "Bug Reporting & Isolation: tracking down complex issues and edge cases, then writing clear defect reports with step-by-step reproduction instructions.",
+      "Developer Collaboration: working hand-in-hand with developers to report bugs, clear up requirements, and retest fixed issues."
     ],
-    skills: ["Jira", "Xray", "JQL", "MS Excel"],
+    skills: ["Jira", "Xray", "JQL", "MS Excel", "Xbox/Playstation dev kits"],
+  },
+  {
+    name: "Manual Tester",
+    company: "Softwebo",
+    location: "Warsaw, Poland",
+    date: "Jul 2026 - Present",
+    details: [
+      "Web & Mobile Testing: performing manual, functional, and regression testing for web and mobile applications related to Healthcare, Pharma, and HoReCa.",
+      "SaaS & RPM Systems: assessing web-based, cloud-enabled SaaS and Remote Patient Monitoring (RPM) systems for reliable and consistent data connectivity from patient devices to clinical dashboards.",
+      "End-to-End & UAT Testing: validating all user flows for medical questionnaires and clinical case scenarios, including User Acceptance Testing (UAT) and data validation.",
+      "API, Integration & DB Testing: executing integration testing, performing REST API verification (JSON), and running SQL queries to validate data integrity between front and back-end layers.",
+      "Test Design, Smoke & Performance: applying black-box testing techniques, executing quick smoke tests for daily builds, and checking system performance and responsiveness.",
+      "Defect Tracking & Log Analysis: analyzing system logs to provide technical context, and tracking defects in Jira from identification to closure.",
+      "Cross-Team Collaboration: collaborating with both frontend and backend developers to quickly resolve complex issues and clarify business requirements."
+    ],
+    skills: ["Jira", "Confluence", "MS Excel", "Postman", "SQL", "DevTools", "Figma"],
   },
 ];
 

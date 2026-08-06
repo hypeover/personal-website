@@ -17,7 +17,7 @@ const Header = () => {
         transition={{ duration: 1, ease: easeOut, delay: 0.2 }}
         className="text-sm sm:text-lg md:text-base lg:text-lg mt-3 text-muted-foreground"
       >
-        Currently working as a QA Tester, I am actively expanding my skills
+        Currently working as a Manual Tester, I am actively expanding my skills
         toward Frontend Development and Data Engineering. My main passion lies
         in web scraping and data processing. I love extracting valuable web
         data, structuring it, and transforming it into clean, user-friendly
