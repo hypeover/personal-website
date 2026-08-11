@@ -55,6 +55,11 @@ const PhotoCarousel = () => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [openIndex, setOpenIndex] = React.useState<number | null>(null);
+  const [expandedLoaded, setExpandedLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    setExpandedLoaded(false);
+  }, [openIndex]);
 
   React.useEffect(() => {
     if (!api) return;
@@ -135,19 +140,37 @@ const PhotoCarousel = () => {
           >
             {(() => {
               const photo = photos[openIndex];
-              const size = displaySize(
+              // The thumbnail-resolution image is already cached from the carousel,
+              // so it paints instantly; the full-resolution one fades in on top of
+              // it once loaded instead of leaving a blank gap while it fetches.
+              const placeholderSize = displaySize(photo.width, photo.height);
+              const fullSize = displaySize(
                 photo.width,
                 photo.height,
                 MAX_EXPANDED_SOURCE_HEIGHT
               );
               return (
-                <motion.div layoutId={`photo-${openIndex}`} className="h-[85vh]">
+                <motion.div
+                  layoutId={`photo-${openIndex}`}
+                  className="relative h-[85vh]"
+                >
                   <Image
                     src={photo.url}
                     alt={photo.title}
-                    width={size.width}
-                    height={size.height}
+                    width={placeholderSize.width}
+                    height={placeholderSize.height}
                     className="h-full w-auto rounded-sm"
+                    priority
+                  />
+                  <Image
+                    src={photo.url}
+                    alt={photo.title}
+                    width={fullSize.width}
+                    height={fullSize.height}
+                    className={`absolute inset-0 h-full w-full rounded-sm object-cover transition-opacity duration-300 ${
+                      expandedLoaded ? "opacity-100" : "opacity-0"
+                    }`}
+                    onLoad={() => setExpandedLoaded(true)}
                     priority
                   />
                 </motion.div>
