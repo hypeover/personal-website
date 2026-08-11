@@ -1,14 +1,18 @@
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import React from 'react'
+import Link from "next/link";
+import PhotoCarousel from "@/components/photography/photo-carousel";
 
 const Page = () => {
   return (
-    <div className='h-screen w-screen justify-center text-center flex flex-col text-5xl' >
-      Soon...
-      <Link href='/' ><Button className='text-3xl p-10 rounded-full mt-5' >Back to home</Button></Link>
+    <div className="relative w-full">
+      <Link
+        href="/"
+        className="absolute top-6 left-6 z-10 text-sm font-medium underline-offset-4 hover:underline"
+      >
+        Back to home
+      </Link>
+      <PhotoCarousel />
     </div>
-  )
-}
+  );
+};
 
-export default Page
+export default Page;
