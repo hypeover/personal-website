@@ -359,7 +359,7 @@ const PhotoCarousel = () => {
         </Carousel>
       ) : (
         <div
-          className="grid grid-cols-2 gap-3 px-4 sm:grid-cols-3 sm:px-8 lg:grid-cols-4 xl:grid-cols-5"
+          className="grid grid-flow-dense grid-cols-2 gap-3 px-4 sm:grid-cols-3 sm:px-8 lg:grid-cols-4 xl:grid-cols-5"
           style={{ gridAutoRows: MASONRY_ROW_UNIT }}
         >
           {displayedPhotos.map((photo, i) => (
