@@ -37,6 +37,18 @@ const photos = [
   { title: "Romania, 2025", url: "/DSCF4966.jpg", width: 4160, height: 6240 },
 ];
 
+// The source files are full-resolution camera exports (20+ MP). Requesting them
+// at that intrinsic size made Next.js serve/decode huge images for what renders
+// at a fraction of that size, which is what caused the scroll/drag jank — cap
+// the size we ask Next.js to generate while keeping each photo's aspect ratio.
+const MAX_SOURCE_HEIGHT = 1200;
+
+function displaySize(width: number, height: number) {
+  if (height <= MAX_SOURCE_HEIGHT) return { width, height };
+  const scale = MAX_SOURCE_HEIGHT / height;
+  return { width: Math.round(width * scale), height: MAX_SOURCE_HEIGHT };
+}
+
 const PhotoCarousel = () => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -63,20 +75,23 @@ const PhotoCarousel = () => {
         className="w-full"
       >
         <CarouselContent className="-ml-3 items-center">
-          {photos.map((photo, i) => (
-            <CarouselItem key={i} className="basis-auto pl-3">
-              <div className="h-[52vh] sm:h-[60vh] lg:h-[66vh]">
-                <Image
-                  src={photo.url}
-                  alt={photo.title}
-                  width={photo.width}
-                  height={photo.height}
-                  className="h-full w-auto rounded-lg"
-                  priority={i === 0}
-                />
-              </div>
-            </CarouselItem>
-          ))}
+          {photos.map((photo, i) => {
+            const size = displaySize(photo.width, photo.height);
+            return (
+              <CarouselItem key={i} className="basis-auto pl-3">
+                <div className="h-[52vh] sm:h-[60vh] lg:h-[66vh]">
+                  <Image
+                    src={photo.url}
+                    alt={photo.title}
+                    width={size.width}
+                    height={size.height}
+                    className="h-full w-auto rounded-sm"
+                    priority={i === 0}
+                  />
+                </div>
+              </CarouselItem>
+            );
+          })}
         </CarouselContent>
 
         <CarouselPrevious className="left-4 lg:left-10" />
