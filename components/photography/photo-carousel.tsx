@@ -10,18 +10,19 @@ import {
   CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { cn } from "@/lib/utils";
 
 // Placeholder data — will be replaced by the generated photo dataset (EXIF + geocoding).
+// width/height are the real source dimensions, used to keep every slide at the
+// same rendered height with the width following each photo's natural aspect ratio.
 const photos = [
-  { title: "Moldova, 2024", url: "/DSCF3848.jpg" },
-  { title: "Georgia, 2026", url: "/DSCF5091.jpg" },
-  { title: "Estonia, 2026", url: "/DSCF4809.jpg" },
-  { title: "Romania, 2025", url: "/DSCF4299.jpg" },
-  { title: "Italy, 2025", url: "/DSCF3063.jpg" },
-  { title: "Romania, 2025", url: "/DSCF4236.jpg" },
-  { title: "Romania, 2025", url: "/DSCF4840.jpg" },
-  { title: "Romania, 2025", url: "/DSCF4966.jpg" },
+  { title: "Moldova, 2024", url: "/DSCF3848.jpg", width: 4160, height: 6240 },
+  { title: "Georgia, 2026", url: "/DSCF5091.jpg", width: 4160, height: 6240 },
+  { title: "Estonia, 2026", url: "/DSCF4809.jpg", width: 4160, height: 6240 },
+  { title: "Romania, 2025", url: "/DSCF4299.jpg", width: 2944, height: 4416 },
+  { title: "Italy, 2025", url: "/DSCF3063.jpg", width: 2944, height: 4416 },
+  { title: "Romania, 2025", url: "/DSCF4236.jpg", width: 2944, height: 4416 },
+  { title: "Romania, 2025", url: "/DSCF4840.jpg", width: 4160, height: 6240 },
+  { title: "Romania, 2025", url: "/DSCF4966.jpg", width: 4160, height: 6240 },
 ];
 
 const PhotoCarousel = () => {
@@ -49,26 +50,16 @@ const PhotoCarousel = () => {
         opts={{ align: "center", loop: true }}
         className="w-full"
       >
-        <CarouselContent className="-ml-6">
+        <CarouselContent className="-ml-3 items-center">
           {photos.map((photo, i) => (
-            <CarouselItem
-              key={i}
-              className="basis-[78%] pl-6 sm:basis-[55%] lg:basis-[38%]"
-            >
-              <div
-                className={cn(
-                  "relative aspect-[3/4] w-full overflow-hidden rounded-2xl transition-all duration-500 ease-out",
-                  i === selectedIndex
-                    ? "scale-100 opacity-100"
-                    : "scale-95 opacity-40"
-                )}
-              >
+            <CarouselItem key={i} className="basis-auto pl-3">
+              <div className="h-[52vh] sm:h-[60vh] lg:h-[66vh]">
                 <Image
                   src={photo.url}
                   alt={photo.title}
-                  fill
-                  sizes="(min-width: 1024px) 38vw, (min-width: 640px) 55vw, 78vw"
-                  className="object-cover"
+                  width={photo.width}
+                  height={photo.height}
+                  className="h-full w-auto rounded-lg"
                   priority={i === 0}
                 />
               </div>
