@@ -163,7 +163,7 @@ const PhotoCarousel = () => {
                 <motion.div
                   layoutId={`photo-${i}`}
                   onClick={() => setOpenIndex(i)}
-                  className="h-[52vh] cursor-zoom-in sm:h-[60vh] lg:h-[66vh]"
+                  className="h-[52vh] cursor-pointer sm:h-[60vh] lg:h-[66vh]"
                 >
                   <Image
                     src={photo.url}

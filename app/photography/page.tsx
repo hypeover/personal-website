@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PhotoCarousel from "@/components/photography/photo-carousel";
+import ThemeToggle from "@/components/home/home-items/mode-toggle";
 
 const Page = () => {
   return (
@@ -10,6 +11,9 @@ const Page = () => {
       >
         Back to home
       </Link>
+      <div className="fixed bottom-5 left-5 z-100">
+        <ThemeToggle />
+      </div>
       <PhotoCarousel />
     </div>
   );
