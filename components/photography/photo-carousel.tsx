@@ -17,11 +17,23 @@ import {
 const photos = [
   { title: "Moldova, 2024", url: "/DSCF3848.jpg", width: 4160, height: 6240 },
   { title: "Georgia, 2026", url: "/DSCF5091.jpg", width: 4160, height: 6240 },
+  {
+    title: "Pisa, Italy, 2025",
+    url: "/a592d3ed-49e8-4a1b-95b4-e6242e4b0a0a.jpg",
+    width: 2048,
+    height: 1365,
+  },
   { title: "Estonia, 2026", url: "/DSCF4809.jpg", width: 4160, height: 6240 },
   { title: "Romania, 2025", url: "/DSCF4299.jpg", width: 2944, height: 4416 },
   { title: "Italy, 2025", url: "/DSCF3063.jpg", width: 2944, height: 4416 },
   { title: "Romania, 2025", url: "/DSCF4236.jpg", width: 2944, height: 4416 },
   { title: "Romania, 2025", url: "/DSCF4840.jpg", width: 4160, height: 6240 },
+  {
+    title: "Siena, Italy, 2025",
+    url: "/e2d69626-b5e3-42cb-9b6b-d2e1231c5401.jpg",
+    width: 2048,
+    height: 1365,
+  },
   { title: "Romania, 2025", url: "/DSCF4966.jpg", width: 4160, height: 6240 },
 ];
 
