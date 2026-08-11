@@ -9,6 +9,7 @@ import {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
+  type CarouselApi,
 } from "@/components/ui/carousel";
 
 // Placeholder data — will be replaced by the generated photo dataset (real EXIF +
@@ -117,6 +118,13 @@ const photos = [
   },
 ];
 
+// Ad-hoc "projects" grouping until real project tags exist — grouped by
+// country from the (currently invented) location data.
+const PROJECTS = [
+  "All",
+  ...Array.from(new Set(photos.map((photo) => photo.location.country))),
+];
+
 function formatCoordinate(value: number, positiveSuffix: string, negativeSuffix: string) {
   return `${Math.abs(value).toFixed(4)}° ${value >= 0 ? positiveSuffix : negativeSuffix}`;
 }
@@ -135,8 +143,30 @@ function displaySize(width: number, height: number, maxHeight = MAX_SOURCE_HEIGH
 }
 
 const PhotoCarousel = () => {
+  const [api, setApi] = React.useState<CarouselApi>();
   const [openIndex, setOpenIndex] = React.useState<number | null>(null);
   const [expandedLoaded, setExpandedLoaded] = React.useState(false);
+  const [activeProject, setActiveProject] = React.useState("All");
+  const [projectMenuOpen, setProjectMenuOpen] = React.useState(false);
+
+  const displayedPhotos =
+    activeProject === "All"
+      ? photos
+      : photos.filter((photo) => photo.location.country === activeProject);
+
+  const selectProject = (project: string) => {
+    setActiveProject(project);
+    setProjectMenuOpen(false);
+    setOpenIndex(null);
+  };
+
+  // Embla's "loop" mode clones slides internally to fill the viewport; changing
+  // how many slides exist (switching project) leaves those clones stale unless
+  // the instance is explicitly reinitialized.
+  React.useEffect(() => {
+    api?.reInit();
+    api?.scrollTo(0);
+  }, [api, activeProject]);
 
   React.useEffect(() => {
     setExpandedLoaded(false);
@@ -154,14 +184,65 @@ const PhotoCarousel = () => {
 
   return (
     <div className="relative flex h-screen w-full flex-col justify-center overflow-hidden bg-background">
-      <Carousel opts={{ align: "center", loop: true }} className="w-full">
+      <div className="absolute top-6 right-6 z-20">
+        <button
+          onClick={() => setProjectMenuOpen((open) => !open)}
+          className="flex items-center gap-1.5 text-sm font-medium"
+        >
+          {activeProject === "All" ? "Projects" : activeProject}
+          <motion.span
+            animate={{ rotate: projectMenuOpen ? 180 : 0 }}
+            transition={{ duration: 0.2, ease: easeOut }}
+            className="text-xs"
+          >
+            ▾
+          </motion.span>
+        </button>
+
+        <AnimatePresence>
+          {projectMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: easeOut }}
+              className="absolute top-full right-0 mt-2 min-w-32 rounded-sm border bg-background/95 py-1.5 shadow-md backdrop-blur-md"
+            >
+              {PROJECTS.map((project) => (
+                <button
+                  key={project}
+                  onClick={() => selectProject(project)}
+                  className={`block w-full px-4 py-1.5 text-left text-sm hover:bg-accent ${
+                    project === activeProject ? "font-medium" : "text-muted-foreground"
+                  }`}
+                >
+                  {project}
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {projectMenuOpen && (
+        <div
+          className="fixed inset-0 z-10"
+          onClick={() => setProjectMenuOpen(false)}
+        />
+      )}
+
+      <Carousel
+        setApi={setApi}
+        opts={{ align: "center", loop: true }}
+        className="w-full"
+      >
         <CarouselContent className="-ml-3 items-center">
-          {photos.map((photo, i) => {
+          {displayedPhotos.map((photo, i) => {
             const size = displaySize(photo.width, photo.height);
             return (
-              <CarouselItem key={i} className="basis-auto pl-3">
+              <CarouselItem key={photo.url} className="basis-auto pl-3">
                 <motion.div
-                  layoutId={`photo-${i}`}
+                  layoutId={`photo-${photo.url}`}
                   onClick={() => setOpenIndex(i)}
                   className="h-[52vh] cursor-pointer sm:h-[60vh] lg:h-[66vh]"
                 >
@@ -193,7 +274,7 @@ const PhotoCarousel = () => {
             onClick={() => setOpenIndex(null)}
           >
             {(() => {
-              const photo = photos[openIndex];
+              const photo = displayedPhotos[openIndex];
               // The thumbnail-resolution image is already cached from the carousel,
               // so it paints instantly; the full-resolution one fades in on top of
               // it once loaded instead of leaving a blank gap while it fetches.
@@ -254,7 +335,7 @@ const PhotoCarousel = () => {
                   </motion.div>
 
                   <motion.div
-                    layoutId={`photo-${openIndex}`}
+                    layoutId={`photo-${photo.url}`}
                     className="relative h-[70vh] lg:h-[85vh]"
                   >
                     <Image
