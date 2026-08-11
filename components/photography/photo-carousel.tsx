@@ -143,6 +143,66 @@ function displaySize(width: number, height: number, maxHeight = MAX_SOURCE_HEIGH
   return { width: Math.round(width * scale), height: maxHeight };
 }
 
+// CSS `columns-N` masonry balances column heights automatically, but with tall
+// photo tiles that balancing is unreliable (it can leave whole columns empty).
+// Instead we use a CSS Grid with a tiny row unit and measure each tile's real
+// rendered height in JS to set `grid-row-end: span N` — a standard trick for a
+// true, non-cropped masonry grid.
+const MASONRY_ROW_UNIT = 4;
+const MASONRY_GAP = 12;
+
+type Photo = (typeof photos)[number];
+
+function MasonryTile({
+  photo,
+  onOpen,
+  priority,
+}: {
+  photo: Photo;
+  onOpen: () => void;
+  priority: boolean;
+}) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const [rowSpan, setRowSpan] = React.useState(1);
+  const size = displaySize(photo.width, photo.height);
+
+  const recalc = React.useCallback(() => {
+    if (!ref.current) return;
+    const height = ref.current.getBoundingClientRect().height;
+    setRowSpan(
+      Math.ceil((height + MASONRY_GAP) / (MASONRY_ROW_UNIT + MASONRY_GAP))
+    );
+  }, []);
+
+  React.useEffect(() => {
+    recalc();
+    window.addEventListener("resize", recalc);
+    return () => window.removeEventListener("resize", recalc);
+  }, [recalc]);
+
+  return (
+    <motion.div
+      layoutId={`photo-${photo.url}`}
+      onClick={onOpen}
+      style={{ gridRowEnd: `span ${rowSpan}` }}
+      className="cursor-pointer overflow-hidden rounded-sm"
+    >
+      <div ref={ref}>
+        <Image
+          src={photo.url}
+          alt={photo.title}
+          width={size.width}
+          height={size.height}
+          sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+          className="h-auto w-full"
+          priority={priority}
+          onLoad={recalc}
+        />
+      </div>
+    </motion.div>
+  );
+}
+
 const PhotoCarousel = () => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [openIndex, setOpenIndex] = React.useState<number | null>(null);
@@ -298,30 +358,18 @@ const PhotoCarousel = () => {
           <CarouselNext className="right-4 lg:right-10" />
         </Carousel>
       ) : (
-        <div className="grid grid-flow-dense auto-rows-[130px] grid-cols-2 gap-2 px-4 sm:auto-rows-[150px] sm:grid-cols-3 sm:gap-3 sm:px-8 lg:auto-rows-[170px] lg:grid-cols-4 xl:grid-cols-5">
-          {displayedPhotos.map((photo, i) => {
-            const isLandscape = photo.width > photo.height;
-            return (
-              <motion.div
-                key={photo.url}
-                layoutId={`photo-${photo.url}`}
-                onClick={() => setOpenIndex(i)}
-                className={cn(
-                  "relative cursor-pointer overflow-hidden rounded-sm",
-                  isLandscape ? "col-span-2 row-span-1" : "col-span-1 row-span-2"
-                )}
-              >
-                <Image
-                  src={photo.url}
-                  alt={photo.title}
-                  fill
-                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-                  className="object-cover"
-                  priority={i < 4}
-                />
-              </motion.div>
-            );
-          })}
+        <div
+          className="grid grid-cols-2 gap-3 px-4 sm:grid-cols-3 sm:px-8 lg:grid-cols-4 xl:grid-cols-5"
+          style={{ gridAutoRows: MASONRY_ROW_UNIT }}
+        >
+          {displayedPhotos.map((photo, i) => (
+            <MasonryTile
+              key={photo.url}
+              photo={photo}
+              onOpen={() => setOpenIndex(i)}
+              priority={i < 4}
+            />
+          ))}
         </div>
       )}
 
