@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import { AnimatePresence, motion } from "motion/react";
 import {
   Carousel,
   CarouselContent,
@@ -42,16 +43,18 @@ const photos = [
 // at a fraction of that size, which is what caused the scroll/drag jank — cap
 // the size we ask Next.js to generate while keeping each photo's aspect ratio.
 const MAX_SOURCE_HEIGHT = 1200;
+const MAX_EXPANDED_SOURCE_HEIGHT = 2000;
 
-function displaySize(width: number, height: number) {
-  if (height <= MAX_SOURCE_HEIGHT) return { width, height };
-  const scale = MAX_SOURCE_HEIGHT / height;
-  return { width: Math.round(width * scale), height: MAX_SOURCE_HEIGHT };
+function displaySize(width: number, height: number, maxHeight = MAX_SOURCE_HEIGHT) {
+  if (height <= maxHeight) return { width, height };
+  const scale = maxHeight / height;
+  return { width: Math.round(width * scale), height: maxHeight };
 }
 
 const PhotoCarousel = () => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [openIndex, setOpenIndex] = React.useState<number | null>(null);
 
   React.useEffect(() => {
     if (!api) return;
@@ -67,6 +70,16 @@ const PhotoCarousel = () => {
     };
   }, [api]);
 
+  React.useEffect(() => {
+    if (openIndex === null) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpenIndex(null);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [openIndex]);
+
   return (
     <div className="relative flex h-screen w-full flex-col justify-center overflow-hidden bg-background">
       <Carousel
@@ -79,7 +92,11 @@ const PhotoCarousel = () => {
             const size = displaySize(photo.width, photo.height);
             return (
               <CarouselItem key={i} className="basis-auto pl-3">
-                <div className="h-[52vh] sm:h-[60vh] lg:h-[66vh]">
+                <motion.div
+                  layoutId={`photo-${i}`}
+                  onClick={() => setOpenIndex(i)}
+                  className="h-[52vh] cursor-zoom-in sm:h-[60vh] lg:h-[66vh]"
+                >
                   <Image
                     src={photo.url}
                     alt={photo.title}
@@ -88,7 +105,7 @@ const PhotoCarousel = () => {
                     className="h-full w-auto rounded-sm"
                     priority={i === 0}
                   />
-                </div>
+                </motion.div>
               </CarouselItem>
             );
           })}
@@ -106,6 +123,39 @@ const PhotoCarousel = () => {
           {selectedIndex + 1} / {photos.length}
         </p>
       </div>
+
+      <AnimatePresence>
+        {openIndex !== null && (
+          <motion.div
+            className="fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-background/95 p-8 backdrop-blur-md"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setOpenIndex(null)}
+          >
+            {(() => {
+              const photo = photos[openIndex];
+              const size = displaySize(
+                photo.width,
+                photo.height,
+                MAX_EXPANDED_SOURCE_HEIGHT
+              );
+              return (
+                <motion.div layoutId={`photo-${openIndex}`} className="h-[85vh]">
+                  <Image
+                    src={photo.url}
+                    alt={photo.title}
+                    width={size.width}
+                    height={size.height}
+                    className="h-full w-auto rounded-sm"
+                    priority
+                  />
+                </motion.div>
+              );
+            })()}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
