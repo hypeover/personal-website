@@ -181,25 +181,37 @@ function MasonryTile({
   }, [recalc]);
 
   return (
-    <motion.div
-      layoutId={`photo-${photo.url}`}
+    // Three levels, deliberately: the OUTER div is the actual grid item —
+    // grid stretches it to fill `gridRowEnd`, so it can't be the measurement
+    // target (that would be circular: its height always reports back
+    // whatever span we last set). The MIDDLE div is a plain, unstretched
+    // block that sizes to its own content, so `ref` here reports the image's
+    // true natural height regardless of the outer span. The INNER motion.div
+    // carries `layoutId` for the shared morph into the expanded view — kept
+    // off both other elements because Framer Motion's automatic layout
+    // animation applies a transform when its element's box changes, and
+    // getBoundingClientRect() picks up in-flight transforms, which is what
+    // caused the measurement feedback loop.
+    <div
       onClick={onOpen}
       style={{ gridRowEnd: `span ${rowSpan}` }}
       className="cursor-pointer overflow-hidden rounded-sm"
     >
       <div ref={ref}>
-        <Image
-          src={photo.url}
-          alt={photo.title}
-          width={size.width}
-          height={size.height}
-          sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-          className="h-auto w-full"
-          priority={priority}
-          onLoad={recalc}
-        />
+        <motion.div layoutId={`photo-${photo.url}`}>
+          <Image
+            src={photo.url}
+            alt={photo.title}
+            width={size.width}
+            height={size.height}
+            sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+            className="h-auto w-full"
+            priority={priority}
+            onLoad={recalc}
+          />
+        </motion.div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
