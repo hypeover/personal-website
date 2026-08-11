@@ -2,14 +2,13 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, easeOut, motion } from "motion/react";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-  type CarouselApi,
 } from "@/components/ui/carousel";
 
 // Placeholder data — will be replaced by the generated photo dataset (real EXIF +
@@ -136,28 +135,12 @@ function displaySize(width: number, height: number, maxHeight = MAX_SOURCE_HEIGH
 }
 
 const PhotoCarousel = () => {
-  const [api, setApi] = React.useState<CarouselApi>();
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [openIndex, setOpenIndex] = React.useState<number | null>(null);
   const [expandedLoaded, setExpandedLoaded] = React.useState(false);
 
   React.useEffect(() => {
     setExpandedLoaded(false);
   }, [openIndex]);
-
-  React.useEffect(() => {
-    if (!api) return;
-
-    const onSelect = () => setSelectedIndex(api.selectedScrollSnap());
-    onSelect();
-    api.on("select", onSelect);
-    api.on("reInit", onSelect);
-
-    return () => {
-      api.off("select", onSelect);
-      api.off("reInit", onSelect);
-    };
-  }, [api]);
 
   React.useEffect(() => {
     if (openIndex === null) return;
@@ -171,11 +154,7 @@ const PhotoCarousel = () => {
 
   return (
     <div className="relative flex h-screen w-full flex-col justify-center overflow-hidden bg-background">
-      <Carousel
-        setApi={setApi}
-        opts={{ align: "center", loop: true }}
-        className="w-full"
-      >
+      <Carousel opts={{ align: "center", loop: true }} className="w-full">
         <CarouselContent className="-ml-3 items-center">
           {photos.map((photo, i) => {
             const size = displaySize(photo.width, photo.height);
@@ -203,15 +182,6 @@ const PhotoCarousel = () => {
         <CarouselPrevious className="left-4 lg:left-10" />
         <CarouselNext className="right-4 lg:right-10" />
       </Carousel>
-
-      <div className="pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2 text-center">
-        <p className="text-sm font-medium tracking-wide">
-          {photos[selectedIndex].title}
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {selectedIndex + 1} / {photos.length}
-        </p>
-      </div>
 
       <AnimatePresence>
         {openIndex !== null && (
@@ -250,22 +220,36 @@ const PhotoCarousel = () => {
               return (
                 <div className="flex flex-col items-center gap-8 lg:flex-row lg:items-center">
                   <motion.div
-                    initial={{ opacity: 0, x: -16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -16 }}
-                    transition={{ duration: 0.3, delay: 0.1 }}
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
+                    variants={{
+                      visible: {
+                        transition: { delayChildren: 0.2, staggerChildren: 0.09 },
+                      },
+                    }}
                     onClick={(e) => e.stopPropagation()}
                     className="w-64 shrink-0 cursor-auto space-y-5 lg:w-56"
                   >
                     {details.map((detail) => (
-                      <div key={detail.label}>
+                      <motion.div
+                        key={detail.label}
+                        variants={{
+                          hidden: { opacity: 0, x: 28 },
+                          visible: {
+                            opacity: 1,
+                            x: 0,
+                            transition: { duration: 0.45, ease: easeOut },
+                          },
+                        }}
+                      >
                         <p className="text-xs tracking-wide text-muted-foreground uppercase">
                           {detail.label}
                         </p>
                         <p className="mt-0.5 text-sm font-medium">
                           {detail.value}
                         </p>
-                      </div>
+                      </motion.div>
                     ))}
                   </motion.div>
 
