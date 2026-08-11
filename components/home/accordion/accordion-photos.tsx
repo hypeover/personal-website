@@ -80,6 +80,13 @@ const AccordionPhotos = () => {
           );
         })}
       </Swiper>
+      <div className="w-full flex justify-center mt-10">
+        <Link href="/photography">
+          <Button className="text-lg px-8 py-6 rounded-full">
+            View all photography
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };
