@@ -3,6 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import { AnimatePresence, easeOut, motion } from "motion/react";
+import { cn } from "@/lib/utils";
 import {
   Carousel,
   CarouselContent,
@@ -148,6 +149,9 @@ const PhotoCarousel = () => {
   const [expandedLoaded, setExpandedLoaded] = React.useState(false);
   const [activeProject, setActiveProject] = React.useState("All");
   const [projectMenuOpen, setProjectMenuOpen] = React.useState(false);
+  const [viewMode, setViewMode] = React.useState<"carousel" | "grid">(
+    "carousel"
+  );
 
   const displayedPhotos =
     activeProject === "All"
@@ -183,7 +187,36 @@ const PhotoCarousel = () => {
   }, [openIndex]);
 
   return (
-    <div className="relative flex h-screen w-full flex-col justify-center overflow-hidden bg-background">
+    <div
+      className={cn(
+        "relative w-full bg-background",
+        viewMode === "carousel"
+          ? "flex h-screen flex-col justify-center overflow-hidden"
+          : "min-h-screen overflow-y-auto pt-24 pb-16"
+      )}
+    >
+      <div className="absolute top-6 left-1/2 z-20 -translate-x-1/2">
+        <div className="flex items-center gap-1 rounded-full border p-1 text-sm">
+          {(["carousel", "grid"] as const).map((mode) => (
+            <button
+              key={mode}
+              onClick={() => {
+                setViewMode(mode);
+                setOpenIndex(null);
+              }}
+              className={cn(
+                "rounded-full px-3 py-1 capitalize transition-colors",
+                viewMode === mode
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {mode}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="absolute top-6 right-6 z-20">
         <button
           onClick={() => setProjectMenuOpen((open) => !open)}
@@ -231,38 +264,66 @@ const PhotoCarousel = () => {
         />
       )}
 
-      <Carousel
-        setApi={setApi}
-        opts={{ align: "center", loop: true }}
-        className="w-full"
-      >
-        <CarouselContent className="-ml-3 items-center">
+      {viewMode === "carousel" ? (
+        <Carousel
+          setApi={setApi}
+          opts={{ align: "center", loop: true }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-3 items-center">
+            {displayedPhotos.map((photo, i) => {
+              const size = displaySize(photo.width, photo.height);
+              return (
+                <CarouselItem key={photo.url} className="basis-auto pl-3">
+                  <motion.div
+                    layoutId={`photo-${photo.url}`}
+                    onClick={() => setOpenIndex(i)}
+                    className="h-[52vh] cursor-pointer sm:h-[60vh] lg:h-[66vh]"
+                  >
+                    <Image
+                      src={photo.url}
+                      alt={photo.title}
+                      width={size.width}
+                      height={size.height}
+                      className="h-full w-auto rounded-sm"
+                      priority={i === 0}
+                    />
+                  </motion.div>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+
+          <CarouselPrevious className="left-4 lg:left-10" />
+          <CarouselNext className="right-4 lg:right-10" />
+        </Carousel>
+      ) : (
+        <div className="grid grid-flow-dense auto-rows-[130px] grid-cols-2 gap-2 px-4 sm:auto-rows-[150px] sm:grid-cols-3 sm:gap-3 sm:px-8 lg:auto-rows-[170px] lg:grid-cols-4 xl:grid-cols-5">
           {displayedPhotos.map((photo, i) => {
-            const size = displaySize(photo.width, photo.height);
+            const isLandscape = photo.width > photo.height;
             return (
-              <CarouselItem key={photo.url} className="basis-auto pl-3">
-                <motion.div
-                  layoutId={`photo-${photo.url}`}
-                  onClick={() => setOpenIndex(i)}
-                  className="h-[52vh] cursor-pointer sm:h-[60vh] lg:h-[66vh]"
-                >
-                  <Image
-                    src={photo.url}
-                    alt={photo.title}
-                    width={size.width}
-                    height={size.height}
-                    className="h-full w-auto rounded-sm"
-                    priority={i === 0}
-                  />
-                </motion.div>
-              </CarouselItem>
+              <motion.div
+                key={photo.url}
+                layoutId={`photo-${photo.url}`}
+                onClick={() => setOpenIndex(i)}
+                className={cn(
+                  "relative cursor-pointer overflow-hidden rounded-sm",
+                  isLandscape ? "col-span-2 row-span-1" : "col-span-1 row-span-2"
+                )}
+              >
+                <Image
+                  src={photo.url}
+                  alt={photo.title}
+                  fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+                  className="object-cover"
+                  priority={i < 4}
+                />
+              </motion.div>
             );
           })}
-        </CarouselContent>
-
-        <CarouselPrevious className="left-4 lg:left-10" />
-        <CarouselNext className="right-4 lg:right-10" />
-      </Carousel>
+        </div>
+      )}
 
       <AnimatePresence>
         {openIndex !== null && (
