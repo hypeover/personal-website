@@ -347,10 +347,13 @@ const PhotoCarousel = () => {
         {viewMode === "carousel" ? (
           <motion.div
             key="carousel"
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.97 }}
-            transition={{ duration: 0.25, ease: easeOut }}
+            initial="hidden"
+            animate="visible"
+            exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.3, ease: easeOut } }}
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
+            }}
             className="w-full"
           >
             <Carousel
@@ -366,6 +369,14 @@ const PhotoCarousel = () => {
                       <motion.div
                         layoutId={`photo-${photo.url}`}
                         onClick={() => setOpenIndex(i)}
+                        variants={{
+                          hidden: { opacity: 0, x: -24 },
+                          visible: {
+                            opacity: 1,
+                            x: 0,
+                            transition: { duration: 0.4, ease: easeOut },
+                          },
+                        }}
                         className="h-[52vh] cursor-pointer sm:h-[60vh] lg:h-[66vh]"
                       >
                         <Image
@@ -392,7 +403,7 @@ const PhotoCarousel = () => {
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.97 }}
-            transition={{ duration: 0.25, ease: easeOut }}
+            transition={{ duration: 0.4, ease: easeOut }}
             className="grid grid-flow-dense grid-cols-2 gap-3 px-4 sm:grid-cols-3 sm:px-8 lg:grid-cols-4 xl:grid-cols-5"
             style={{ gridAutoRows: MASONRY_ROW_UNIT }}
           >
