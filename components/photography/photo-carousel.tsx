@@ -277,12 +277,19 @@ const PhotoCarousel = () => {
                 setOpenIndex(null);
               }}
               className={cn(
-                "rounded-full px-3 py-1 capitalize transition-colors",
+                "relative rounded-full px-3 py-1 capitalize transition-colors",
                 viewMode === mode
-                  ? "bg-foreground text-background"
+                  ? "text-background"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
+              {viewMode === mode && (
+                <motion.span
+                  layoutId="view-mode-pill"
+                  transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                  className="absolute inset-0 -z-10 rounded-full bg-foreground"
+                />
+              )}
               {mode}
             </button>
           ))}
