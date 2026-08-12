@@ -343,54 +343,70 @@ const PhotoCarousel = () => {
         />
       )}
 
-      {viewMode === "carousel" ? (
-        <Carousel
-          setApi={setApi}
-          opts={{ align: "center", loop: true }}
-          className="w-full"
-        >
-          <CarouselContent className="-ml-3 items-center">
-            {displayedPhotos.map((photo, i) => {
-              const size = displaySize(photo.width, photo.height);
-              return (
-                <CarouselItem key={photo.url} className="basis-auto pl-3">
-                  <motion.div
-                    layoutId={`photo-${photo.url}`}
-                    onClick={() => setOpenIndex(i)}
-                    className="h-[52vh] cursor-pointer sm:h-[60vh] lg:h-[66vh]"
-                  >
-                    <Image
-                      src={photo.url}
-                      alt={photo.title}
-                      width={size.width}
-                      height={size.height}
-                      className="h-full w-auto rounded-sm"
-                      priority={i === 0}
-                    />
-                  </motion.div>
-                </CarouselItem>
-              );
-            })}
-          </CarouselContent>
+      <AnimatePresence mode="wait">
+        {viewMode === "carousel" ? (
+          <motion.div
+            key="carousel"
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.97 }}
+            transition={{ duration: 0.25, ease: easeOut }}
+            className="w-full"
+          >
+            <Carousel
+              setApi={setApi}
+              opts={{ align: "center", loop: true }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-3 items-center">
+                {displayedPhotos.map((photo, i) => {
+                  const size = displaySize(photo.width, photo.height);
+                  return (
+                    <CarouselItem key={photo.url} className="basis-auto pl-3">
+                      <motion.div
+                        layoutId={`photo-${photo.url}`}
+                        onClick={() => setOpenIndex(i)}
+                        className="h-[52vh] cursor-pointer sm:h-[60vh] lg:h-[66vh]"
+                      >
+                        <Image
+                          src={photo.url}
+                          alt={photo.title}
+                          width={size.width}
+                          height={size.height}
+                          className="h-full w-auto rounded-sm"
+                          priority={i === 0}
+                        />
+                      </motion.div>
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
 
-          <CarouselPrevious className="left-4 lg:left-10" />
-          <CarouselNext className="right-4 lg:right-10" />
-        </Carousel>
-      ) : (
-        <div
-          className="grid grid-flow-dense grid-cols-2 gap-3 px-4 sm:grid-cols-3 sm:px-8 lg:grid-cols-4 xl:grid-cols-5"
-          style={{ gridAutoRows: MASONRY_ROW_UNIT }}
-        >
-          {displayedPhotos.map((photo, i) => (
-            <MasonryTile
-              key={photo.url}
-              photo={photo}
-              onOpen={() => setOpenIndex(i)}
-              priority={i < 4}
-            />
-          ))}
-        </div>
-      )}
+              <CarouselPrevious className="left-4 lg:left-10" />
+              <CarouselNext className="right-4 lg:right-10" />
+            </Carousel>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="grid"
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.97 }}
+            transition={{ duration: 0.25, ease: easeOut }}
+            className="grid grid-flow-dense grid-cols-2 gap-3 px-4 sm:grid-cols-3 sm:px-8 lg:grid-cols-4 xl:grid-cols-5"
+            style={{ gridAutoRows: MASONRY_ROW_UNIT }}
+          >
+            {displayedPhotos.map((photo, i) => (
+              <MasonryTile
+                key={photo.url}
+                photo={photo}
+                onOpen={() => setOpenIndex(i)}
+                priority={i < 4}
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {openIndex !== null && (
