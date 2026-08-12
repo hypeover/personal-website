@@ -244,6 +244,36 @@ const PhotoCarousel = () => {
     api?.scrollTo(0);
   }, [api, activeProject]);
 
+  // With align:"center" + loop, embla wraps the last slide(s) around to the
+  // left of the screen on mount — so slide 0 (first to animate under plain
+  // index order) actually lands mid-screen, not at the true left edge. Measure
+  // each slide's real on-screen x once it's laid out and stagger by that
+  // instead of array order, so the entrance reveal genuinely sweeps left to
+  // right across the viewport regardless of where embla's loop puts slide 0.
+  const carouselRef = React.useRef<HTMLDivElement>(null);
+  const [carouselEntryOrder, setCarouselEntryOrder] = React.useState<number[]>(
+    []
+  );
+
+  React.useLayoutEffect(() => {
+    if (viewMode !== "carousel") return;
+    const container = carouselRef.current;
+    if (!container) return;
+    const items = Array.from(
+      container.querySelectorAll('[data-slot="carousel-item"]')
+    );
+    const withX = items.map((el, i) => ({
+      i,
+      x: el.getBoundingClientRect().x,
+    }));
+    withX.sort((a, b) => a.x - b.x);
+    const order = new Array(items.length);
+    withX.forEach(({ i }, rank) => {
+      order[i] = rank;
+    });
+    setCarouselEntryOrder(order);
+  }, [viewMode, displayedPhotos]);
+
   React.useEffect(() => {
     setExpandedLoaded(false);
   }, [openIndex]);
@@ -347,13 +377,11 @@ const PhotoCarousel = () => {
         {viewMode === "carousel" ? (
           <motion.div
             key="carousel"
+            ref={carouselRef}
             initial="hidden"
             animate="visible"
             exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.3, ease: easeOut } }}
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
-            }}
+            variants={{ hidden: {}, visible: {} }}
             className="w-full"
           >
             <Carousel
@@ -369,13 +397,18 @@ const PhotoCarousel = () => {
                       <motion.div
                         layoutId={`photo-${photo.url}`}
                         onClick={() => setOpenIndex(i)}
+                        custom={carouselEntryOrder[i] ?? i}
                         variants={{
                           hidden: { opacity: 0, x: -24 },
-                          visible: {
+                          visible: (order: number) => ({
                             opacity: 1,
                             x: 0,
-                            transition: { duration: 0.4, ease: easeOut },
-                          },
+                            transition: {
+                              duration: 0.4,
+                              ease: easeOut,
+                              delay: order * 0.05,
+                            },
+                          }),
                         }}
                         className="h-[52vh] cursor-pointer sm:h-[60vh] lg:h-[66vh]"
                       >
