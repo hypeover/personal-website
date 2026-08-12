@@ -224,6 +224,10 @@ const PhotoCarousel = () => {
   const [viewMode, setViewMode] = React.useState<"carousel" | "grid">(
     "carousel"
   );
+  const switchViewMode = (mode: "carousel" | "grid") => {
+    setOpenIndex(null);
+    setViewMode(mode);
+  };
 
   const displayedPhotos =
     activeProject === "All"
@@ -255,23 +259,30 @@ const PhotoCarousel = () => {
     []
   );
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     if (viewMode !== "carousel") return;
-    const container = carouselRef.current;
-    if (!container) return;
-    const items = Array.from(
-      container.querySelectorAll('[data-slot="carousel-item"]')
-    );
-    const withX = items.map((el, i) => ({
-      i,
-      x: el.getBoundingClientRect().x,
-    }));
-    withX.sort((a, b) => a.x - b.x);
-    const order = new Array(items.length);
-    withX.forEach(({ i }, rank) => {
-      order[i] = rank;
+    // Embla applies its own centering/loop-wrap transform after mount, not
+    // synchronously with React's render — measuring immediately (even in a
+    // layout effect) catches slides still in their untransformed, natural
+    // DOM order. Waiting a frame lets Embla finish positioning first.
+    const raf = requestAnimationFrame(() => {
+      const container = carouselRef.current;
+      if (!container) return;
+      const items = Array.from(
+        container.querySelectorAll('[data-slot="carousel-item"]')
+      );
+      const withX = items.map((el, i) => ({
+        i,
+        x: el.getBoundingClientRect().x,
+      }));
+      withX.sort((a, b) => a.x - b.x);
+      const order = new Array(items.length);
+      withX.forEach(({ i }, rank) => {
+        order[i] = rank;
+      });
+      setCarouselEntryOrder(order);
     });
-    setCarouselEntryOrder(order);
+    return () => cancelAnimationFrame(raf);
   }, [viewMode, displayedPhotos]);
 
   React.useEffect(() => {
@@ -294,7 +305,7 @@ const PhotoCarousel = () => {
         "relative w-full bg-background",
         viewMode === "carousel"
           ? "flex h-screen flex-col justify-center overflow-hidden"
-          : "min-h-screen overflow-y-auto pt-24 pb-16"
+          : "min-h-screen pt-24 pb-16"
       )}
     >
       <div className="absolute top-6 left-1/2 z-20 -translate-x-1/2">
@@ -302,10 +313,7 @@ const PhotoCarousel = () => {
           {(["carousel", "grid"] as const).map((mode) => (
             <button
               key={mode}
-              onClick={() => {
-                setViewMode(mode);
-                setOpenIndex(null);
-              }}
+              onClick={() => switchViewMode(mode)}
               className={cn(
                 "relative rounded-full px-3 py-1 capitalize transition-colors",
                 viewMode === mode
@@ -378,10 +386,7 @@ const PhotoCarousel = () => {
           <motion.div
             key="carousel"
             ref={carouselRef}
-            initial="hidden"
-            animate="visible"
-            exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.3, ease: easeOut } }}
-            variants={{ hidden: {}, visible: {} }}
+            exit={{ opacity: 0, y: -24, transition: { duration: 0.4, ease: easeOut } }}
             className="w-full"
           >
             <Carousel
@@ -392,23 +397,21 @@ const PhotoCarousel = () => {
               <CarouselContent className="-ml-3 items-center">
                 {displayedPhotos.map((photo, i) => {
                   const size = displaySize(photo.width, photo.height);
+                  const order = carouselEntryOrder[i] ?? i;
                   return (
                     <CarouselItem key={photo.url} className="basis-auto pl-3">
                       <motion.div
                         layoutId={`photo-${photo.url}`}
                         onClick={() => setOpenIndex(i)}
-                        custom={carouselEntryOrder[i] ?? i}
-                        variants={{
-                          hidden: { opacity: 0, x: -24 },
-                          visible: (order: number) => ({
-                            opacity: 1,
-                            x: 0,
-                            transition: {
-                              duration: 0.4,
-                              ease: easeOut,
-                              delay: order * 0.05,
-                            },
-                          }),
+                        initial={{ opacity: 0, x: -24 }}
+                        animate={{
+                          opacity: 1,
+                          x: 0,
+                          transition: {
+                            duration: 0.4,
+                            ease: easeOut,
+                            delay: order * 0.05,
+                          },
                         }}
                         className="h-[52vh] cursor-pointer sm:h-[60vh] lg:h-[66vh]"
                       >

@@ -1,10 +1,14 @@
+"use client";
 import Link from "next/link";
 import PhotoCarousel from "@/components/photography/photo-carousel";
 import ThemeToggle from "@/components/home/home-items/mode-toggle";
+import "lenis/dist/lenis.css";
+import { ReactLenis } from "lenis/react";
 
 const Page = () => {
   return (
-    <div className="relative w-full">
+    <div className="relative w-full scrollbar-none">
+      <ReactLenis root />
       <Link
         href="/"
         className="absolute top-6 left-6 z-10 text-sm font-medium underline-offset-4 hover:underline"

@@ -47,7 +47,7 @@ export default function RootLayout({
               jetbrainsMono.variable,
              "font-sans", figtree.variable)}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col scrollbar-none">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
