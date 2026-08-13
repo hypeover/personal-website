@@ -252,38 +252,14 @@ const PhotoCarousel = () => {
   // left of the screen on mount — so slide 0 (first to animate under plain
   // index order) actually lands mid-screen, not at the true left edge. Measure
   // each slide's real on-screen x once it's laid out and stagger by that
-  // instead of array order, so the entrance reveal genuinely sweeps left to
-  // right across the viewport regardless of where embla's loop puts slide 0.
-  const carouselRef = React.useRef<HTMLDivElement>(null);
-  const [carouselEntryOrder, setCarouselEntryOrder] = React.useState<number[]>(
-    []
-  );
-
-  React.useEffect(() => {
-    if (viewMode !== "carousel") return;
-    // Embla applies its own centering/loop-wrap transform after mount, not
-    // synchronously with React's render — measuring immediately (even in a
-    // layout effect) catches slides still in their untransformed, natural
-    // DOM order. Waiting a frame lets Embla finish positioning first.
-    const raf = requestAnimationFrame(() => {
-      const container = carouselRef.current;
-      if (!container) return;
-      const items = Array.from(
-        container.querySelectorAll('[data-slot="carousel-item"]')
-      );
-      const withX = items.map((el, i) => ({
-        i,
-        x: el.getBoundingClientRect().x,
-      }));
-      withX.sort((a, b) => a.x - b.x);
-      const order = new Array(items.length);
-      withX.forEach(({ i }, rank) => {
-        order[i] = rank;
-      });
-      setCarouselEntryOrder(order);
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [viewMode, displayedPhotos]);
+  // Embla centers slide index 0 by default (and we reset to it on every
+  // project switch via scrollTo(0)), so it's the visual anchor. Circular
+  // distance from it — wrapping around the end of the array — matches how
+  // loop mode actually places slides on screen: the last slide(s) sit just
+  // to index 0's left, so they should ripple out at the same time as index 1
+  // ripples out to its right, not lag behind as "last in array order" would.
+  const carouselRippleOrder = (i: number) =>
+    Math.min(i, displayedPhotos.length - i);
 
   React.useEffect(() => {
     setExpandedLoaded(false);
@@ -385,7 +361,6 @@ const PhotoCarousel = () => {
         {viewMode === "carousel" ? (
           <motion.div
             key="carousel"
-            ref={carouselRef}
             exit={{ opacity: 0, y: -24, transition: { duration: 0.4, ease: easeOut } }}
             className="w-full"
           >
@@ -397,16 +372,16 @@ const PhotoCarousel = () => {
               <CarouselContent className="-ml-3 items-center">
                 {displayedPhotos.map((photo, i) => {
                   const size = displaySize(photo.width, photo.height);
-                  const order = carouselEntryOrder[i] ?? i;
+                  const order = carouselRippleOrder(i);
                   return (
                     <CarouselItem key={photo.url} className="basis-auto pl-3">
                       <motion.div
                         layoutId={`photo-${photo.url}`}
                         onClick={() => setOpenIndex(i)}
-                        initial={{ opacity: 0, x: -24 }}
+                        initial={{ opacity: 0, scale: 0.9 }}
                         animate={{
                           opacity: 1,
-                          x: 0,
+                          scale: 1,
                           transition: {
                             duration: 0.4,
                             ease: easeOut,
