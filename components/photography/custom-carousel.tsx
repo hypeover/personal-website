@@ -17,7 +17,7 @@ export interface Photo {
 
 interface CustomCarouselProps {
   photos: Photo[];
-  onPhotoClick?: (index: number) => void;
+  onPhotoClick?: (index: number, originRect: DOMRect) => void;
   activePhotoUrl?: string;
 }
 
@@ -165,13 +165,11 @@ export function CustomCarousel({ photos, onPhotoClick, activePhotoUrl }: CustomC
           const originalIndex = idx % photos.length;
           const aspectRatio = photo.width / photo.height;
 
-          const isFirstSet = idx < photos.length;
           const isActive = photo.url === activePhotoUrl;
 
           return (
             <motion.div
               key={`${photo.url}-${idx}`}
-              layoutId={isFirstSet ? `photo-${photo.url}` : undefined}
               initial={{ opacity: 0, y: -50 }}
               animate={{ opacity: isActive ? 0 : 1, y: 0 }}
               transition={{
@@ -179,7 +177,7 @@ export function CustomCarousel({ photos, onPhotoClick, activePhotoUrl }: CustomC
                 delay: activePhotoUrl ? 0 : idx * 0.12,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              onClick={() => onPhotoClick?.(originalIndex)}
+              onClick={(e) => onPhotoClick?.(originalIndex, e.currentTarget.getBoundingClientRect())}
               className="relative h-[52vh] sm:h-[60vh] lg:h-[66vh] shrink-0 cursor-pointer overflow-hidden rounded-sm"
               style={{ width: `calc(66vh * ${aspectRatio})` }}
             >

@@ -184,8 +184,87 @@ function MasonryTile({
   );
 }
 
+type Flip = { x: number; y: number; scaleX: number; scaleY: number };
+
+function ZoomedPhoto({
+  photo,
+  originRect,
+  placeholderSize,
+  fullSize,
+  expandedLoaded,
+  onExpandedLoad,
+}: {
+  photo: Photo;
+  originRect: DOMRect | null;
+  placeholderSize: { width: number; height: number };
+  fullSize: { width: number; height: number };
+  expandedLoaded: boolean;
+  onExpandedLoad: () => void;
+}) {
+  const [flip, setFlip] = React.useState<Flip | null>(null);
+  const [measured, setMeasured] = React.useState(!originRect);
+
+  // First mount is invisible and only used to measure the fully-rendered box
+  // (which depends on the lg: breakpoint and the image's own aspect ratio).
+  // Once measured, we remount with the correct starting transform so the
+  // image visibly grows from the clicked thumbnail instead of popping in.
+  const measureRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      if (!node || !originRect || measured) return;
+      const rect = node.getBoundingClientRect();
+      setFlip({
+        x: originRect.left + originRect.width / 2 - (rect.left + rect.width / 2),
+        y: originRect.top + originRect.height / 2 - (rect.top + rect.height / 2),
+        scaleX: originRect.width / rect.width,
+        scaleY: originRect.height / rect.height,
+      });
+      setMeasured(true);
+    },
+    [originRect, measured]
+  );
+
+  return (
+    <motion.div
+      key={measured ? "ready" : "measuring"}
+      ref={measureRef}
+      initial={
+        !measured
+          ? { opacity: 0 }
+          : flip
+            ? { x: flip.x, y: flip.y, scaleX: flip.scaleX, scaleY: flip.scaleY, opacity: 1 }
+            : { opacity: 0, scale: 0.95 }
+      }
+      animate={{ x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.5, ease: easeOut }}
+      className="relative h-[70vh] lg:h-[85vh]"
+    >
+      <Image
+        src={photo.url}
+        alt={photo.title}
+        width={placeholderSize.width}
+        height={placeholderSize.height}
+        className="h-full w-auto rounded-sm"
+        priority
+      />
+      <Image
+        src={photo.url}
+        alt={photo.title}
+        width={fullSize.width}
+        height={fullSize.height}
+        className={`absolute inset-0 h-full w-full rounded-sm object-cover transition-opacity duration-300 ${
+          expandedLoaded ? "opacity-100" : "opacity-0"
+        }`}
+        onLoad={onExpandedLoad}
+        priority
+      />
+    </motion.div>
+  );
+}
+
 export default function PhotoCarousel() {
   const [openIndex, setOpenIndex] = React.useState<number | null>(null);
+  const [originRect, setOriginRect] = React.useState<DOMRect | null>(null);
   const [expandedLoaded, setExpandedLoaded] = React.useState(false);
   const [activeProject, setActiveProject] = React.useState("All");
   const [projectMenuOpen, setProjectMenuOpen] = React.useState(false);
@@ -342,7 +421,10 @@ export default function PhotoCarousel() {
           >
             <CustomCarousel
               photos={displayedPhotos}
-              onPhotoClick={(index) => setOpenIndex(index)}
+              onPhotoClick={(index, rect) => {
+                setOriginRect(rect);
+                setOpenIndex(index);
+              }}
               activePhotoUrl={openIndex !== null ? displayedPhotos[openIndex]?.url : undefined}
             />
           </motion.div>
@@ -365,7 +447,10 @@ export default function PhotoCarousel() {
                 <MasonryTile
                   key={photo.url}
                   photo={photo}
-                  onOpen={() => setOpenIndex(i)}
+                  onOpen={() => {
+                    setOriginRect(null);
+                    setOpenIndex(i);
+                  }}
                   priority={i < 4}
                 />
               ))}
@@ -442,34 +527,14 @@ export default function PhotoCarousel() {
                     ))}
                   </motion.div>
 
-                  <motion.div
-                    layoutId={viewMode === "carousel" ? `photo-${photo.url}` : undefined}
-                    initial={viewMode === "carousel" ? false : { opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.4, ease: easeOut }}
-                    className="relative h-[70vh] lg:h-[85vh]"
-                  >
-                    <Image
-                      src={photo.url}
-                      alt={photo.title}
-                      width={placeholderSize.width}
-                      height={placeholderSize.height}
-                      className="h-full w-auto rounded-sm"
-                      priority
-                    />
-                    <Image
-                      src={photo.url}
-                      alt={photo.title}
-                      width={fullSize.width}
-                      height={fullSize.height}
-                      className={`absolute inset-0 h-full w-full rounded-sm object-cover transition-opacity duration-300 ${
-                        expandedLoaded ? "opacity-100" : "opacity-0"
-                      }`}
-                      onLoad={() => setExpandedLoaded(true)}
-                      priority
-                    />
-                  </motion.div>
+                  <ZoomedPhoto
+                    photo={photo}
+                    originRect={viewMode === "carousel" ? originRect : null}
+                    placeholderSize={placeholderSize}
+                    fullSize={fullSize}
+                    expandedLoaded={expandedLoaded}
+                    onExpandedLoad={() => setExpandedLoaded(true)}
+                  />
                 </div>
               );
             })()}
