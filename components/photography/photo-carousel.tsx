@@ -252,15 +252,6 @@ const PhotoCarousel = () => {
   // left of the screen on mount — so slide 0 (first to animate under plain
   // index order) actually lands mid-screen, not at the true left edge. Measure
   // each slide's real on-screen x once it's laid out and stagger by that
-  // Embla centers slide index 0 by default (and we reset to it on every
-  // project switch via scrollTo(0)), so it's the visual anchor. Circular
-  // distance from it — wrapping around the end of the array — matches how
-  // loop mode actually places slides on screen: the last slide(s) sit just
-  // to index 0's left, so they should ripple out at the same time as index 1
-  // ripples out to its right, not lag behind as "last in array order" would.
-  const carouselRippleOrder = (i: number) =>
-    Math.min(i, displayedPhotos.length - i);
-
   React.useEffect(() => {
     setExpandedLoaded(false);
   }, [openIndex]);
@@ -361,7 +352,10 @@ const PhotoCarousel = () => {
         {viewMode === "carousel" ? (
           <motion.div
             key="carousel"
-            exit={{ opacity: 0, y: -24, transition: { duration: 0.4, ease: easeOut } }}
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, y: -24 }}
+            transition={{ duration: 0.4, ease: easeOut }}
             className="w-full"
           >
             <Carousel
@@ -372,22 +366,11 @@ const PhotoCarousel = () => {
               <CarouselContent className="-ml-3 items-center">
                 {displayedPhotos.map((photo, i) => {
                   const size = displaySize(photo.width, photo.height);
-                  const order = carouselRippleOrder(i);
                   return (
                     <CarouselItem key={photo.url} className="basis-auto pl-3">
                       <motion.div
                         layoutId={`photo-${photo.url}`}
                         onClick={() => setOpenIndex(i)}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{
-                          opacity: 1,
-                          scale: 1,
-                          transition: {
-                            duration: 0.4,
-                            ease: easeOut,
-                            delay: order * 0.05,
-                          },
-                        }}
                         className="h-[52vh] cursor-pointer sm:h-[60vh] lg:h-[66vh]"
                       >
                         <Image
