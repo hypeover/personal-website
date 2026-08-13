@@ -18,9 +18,10 @@ export interface Photo {
 interface CustomCarouselProps {
   photos: Photo[];
   onPhotoClick?: (index: number) => void;
+  activePhotoUrl?: string;
 }
 
-export function CustomCarousel({ photos, onPhotoClick }: CustomCarouselProps) {
+export function CustomCarousel({ photos, onPhotoClick, activePhotoUrl }: CustomCarouselProps) {
   const trackRef = React.useRef<HTMLDivElement>(null);
 
   const doublePhotos = React.useMemo(() => [...photos, ...photos], [photos]);
@@ -164,14 +165,18 @@ export function CustomCarousel({ photos, onPhotoClick }: CustomCarouselProps) {
           const originalIndex = idx % photos.length;
           const aspectRatio = photo.width / photo.height;
 
+          const isFirstSet = idx < photos.length;
+          const isActive = photo.url === activePhotoUrl;
+
           return (
             <motion.div
               key={`${photo.url}-${idx}`}
+              layoutId={isFirstSet ? `photo-${photo.url}` : undefined}
               initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={{ opacity: isActive ? 0 : 1, y: 0 }}
               transition={{
-                duration: 0.65,
-                delay: idx * 0.12,
+                duration: activePhotoUrl ? 0.3 : 0.65,
+                delay: activePhotoUrl ? 0 : idx * 0.12,
                 ease: [0.16, 1, 0.3, 1],
               }}
               onClick={() => onPhotoClick?.(originalIndex)}

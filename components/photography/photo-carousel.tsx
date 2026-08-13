@@ -343,6 +343,7 @@ export default function PhotoCarousel() {
             <CustomCarousel
               photos={displayedPhotos}
               onPhotoClick={(index) => setOpenIndex(index)}
+              activePhotoUrl={openIndex !== null ? displayedPhotos[openIndex]?.url : undefined}
             />
           </motion.div>
         ) : (
@@ -442,10 +443,11 @@ export default function PhotoCarousel() {
                   </motion.div>
 
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    layoutId={viewMode === "carousel" ? `photo-${photo.url}` : undefined}
+                    initial={viewMode === "carousel" ? false : { opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.3, ease: easeOut }}
+                    transition={{ duration: 0.4, ease: easeOut }}
                     className="relative h-[70vh] lg:h-[85vh]"
                   >
                     <Image
