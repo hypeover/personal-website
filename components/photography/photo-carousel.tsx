@@ -181,35 +181,28 @@ function MasonryTile({
   }, [recalc]);
 
   return (
-    // Three levels, deliberately: the OUTER div is the actual grid item —
-    // grid stretches it to fill `gridRowEnd`, so it can't be the measurement
-    // target (that would be circular: its height always reports back
-    // whatever span we last set). The MIDDLE div is a plain, unstretched
-    // block that sizes to its own content, so `ref` here reports the image's
-    // true natural height regardless of the outer span. The INNER motion.div
-    // carries `layoutId` for the shared morph into the expanded view — kept
-    // off both other elements because Framer Motion's automatic layout
-    // animation applies a transform when its element's box changes, and
-    // getBoundingClientRect() picks up in-flight transforms, which is what
-    // caused the measurement feedback loop.
+    // Two levels: the OUTER div is the actual grid item — grid stretches it
+    // to fill `gridRowEnd`, so it can't be the measurement target (that would
+    // be circular: its height always reports back whatever span we last
+    // set). The INNER div is a plain, unstretched block that sizes to its
+    // own content, so `ref` here reports the image's true natural height
+    // regardless of the outer span.
     <div
       onClick={onOpen}
       style={{ gridRowEnd: `span ${rowSpan}` }}
       className="cursor-pointer overflow-hidden rounded-sm"
     >
       <div ref={ref}>
-        <motion.div layoutId={`photo-${photo.url}`}>
-          <Image
-            src={photo.url}
-            alt={photo.title}
-            width={size.width}
-            height={size.height}
-            sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-            className="h-auto w-full rounded-sm"
-            priority={priority}
-            onLoad={recalc}
-          />
-        </motion.div>
+        <Image
+          src={photo.url}
+          alt={photo.title}
+          width={size.width}
+          height={size.height}
+          sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+          className="h-auto w-full rounded-sm"
+          priority={priority}
+          onLoad={recalc}
+        />
       </div>
     </div>
   );
@@ -368,8 +361,7 @@ const PhotoCarousel = () => {
                   const size = displaySize(photo.width, photo.height);
                   return (
                     <CarouselItem key={photo.url} className="basis-auto pl-3">
-                      <motion.div
-                        layoutId={`photo-${photo.url}`}
+                      <div
                         onClick={() => setOpenIndex(i)}
                         className="h-[52vh] cursor-pointer sm:h-[60vh] lg:h-[66vh]"
                       >
@@ -381,7 +373,7 @@ const PhotoCarousel = () => {
                           className="h-full w-auto rounded-sm"
                           priority={i === 0}
                         />
-                      </motion.div>
+                      </div>
                     </CarouselItem>
                   );
                 })}
@@ -484,7 +476,10 @@ const PhotoCarousel = () => {
                   </motion.div>
 
                   <motion.div
-                    layoutId={`photo-${photo.url}`}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.3, ease: easeOut }}
                     className="relative h-[70vh] lg:h-[85vh]"
                   >
                     <Image
