@@ -2,12 +2,15 @@
 
 import * as React from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { AnimatePresence, easeOut, motion } from "motion/react";
 
 import "lenis/dist/lenis.css";
 import { ReactLenis } from "lenis/react";
 
 import { CustomCarousel } from "./custom-carousel";
+
+const PhotoMap = dynamic(() => import("./photo-map"), { ssr: false });
 
 const photos = [
   {
@@ -189,20 +192,20 @@ export default function PhotoCarousel() {
   const [expandedLoaded, setExpandedLoaded] = React.useState(false);
   const [activeProject, setActiveProject] = React.useState("All");
   const [projectMenuOpen, setProjectMenuOpen] = React.useState(false);
-  const [viewMode, setViewMode] = React.useState<"carousel" | "grid">("carousel");
+  const [viewMode, setViewMode] = React.useState<"carousel" | "grid" | "map">("carousel");
 
   // Zarządzanie stanem przewijania i blokada widocznego scrollbara
   React.useEffect(() => {
-    if (viewMode === "carousel") {
-      document.documentElement.style.overflow = "hidden";
-      document.body.style.overflow = "hidden";
-    } else {
+    if (viewMode === "grid") {
       document.documentElement.style.overflow = "auto";
       document.body.style.overflow = "auto";
+    } else {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
     }
   }, [viewMode]);
 
-  const switchViewMode = (mode: "carousel" | "grid") => {
+  const switchViewMode = (mode: "carousel" | "grid" | "map") => {
     setOpenIndex(null);
     if (mode === "carousel") {
       window.scrollTo(0, 0);
@@ -253,7 +256,7 @@ export default function PhotoCarousel() {
       {/* Switcher trybów */}
       <div className="fixed top-6 left-1/2 z-30 -translate-x-1/2">
         <div className="flex items-center gap-1 rounded-full border bg-background/80 backdrop-blur-md p-1 text-sm shadow-sm">
-          {(["carousel", "grid"] as const).map((mode) => (
+          {(["carousel", "grid", "map"] as const).map((mode) => (
             <button
               key={mode}
               onClick={() => switchViewMode(mode)}
@@ -341,6 +344,20 @@ export default function PhotoCarousel() {
             className="flex h-screen w-full flex-col justify-center"
           >
             <CustomCarousel
+              photos={displayedPhotos}
+              onPhotoClick={(index) => setOpenIndex(index)}
+            />
+          </motion.div>
+        ) : viewMode === "map" ? (
+          <motion.div
+            key="map"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.3, ease: "easeOut" } }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="h-screen w-full"
+          >
+            <PhotoMap
               photos={displayedPhotos}
               onPhotoClick={(index) => setOpenIndex(index)}
             />
