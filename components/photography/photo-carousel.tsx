@@ -236,7 +236,7 @@ function ZoomedPhoto({
       }
       animate={{ x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.5, ease: easeOut }}
+      transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
       className="relative h-[70vh] lg:h-[85vh]"
     >
       <Image
@@ -265,6 +265,7 @@ function ZoomedPhoto({
 export default function PhotoCarousel() {
   const [openIndex, setOpenIndex] = React.useState<number | null>(null);
   const [originRect, setOriginRect] = React.useState<DOMRect | null>(null);
+  const [activeCarouselKey, setActiveCarouselKey] = React.useState<string | undefined>(undefined);
   const [expandedLoaded, setExpandedLoaded] = React.useState(false);
   const [activeProject, setActiveProject] = React.useState("All");
   const [projectMenuOpen, setProjectMenuOpen] = React.useState(false);
@@ -421,11 +422,12 @@ export default function PhotoCarousel() {
           >
             <CustomCarousel
               photos={displayedPhotos}
-              onPhotoClick={(index, rect) => {
+              onPhotoClick={(index, rect, key) => {
                 setOriginRect(rect);
+                setActiveCarouselKey(key);
                 setOpenIndex(index);
               }}
-              activePhotoUrl={openIndex !== null ? displayedPhotos[openIndex]?.url : undefined}
+              activeKey={openIndex !== null ? activeCarouselKey : undefined}
             />
           </motion.div>
         ) : (
@@ -467,6 +469,7 @@ export default function PhotoCarousel() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
             onClick={() => setOpenIndex(null)}
           >
             {(() => {

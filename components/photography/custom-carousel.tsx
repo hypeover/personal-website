@@ -17,11 +17,11 @@ export interface Photo {
 
 interface CustomCarouselProps {
   photos: Photo[];
-  onPhotoClick?: (index: number, originRect: DOMRect) => void;
-  activePhotoUrl?: string;
+  onPhotoClick?: (index: number, originRect: DOMRect, key: string) => void;
+  activeKey?: string;
 }
 
-export function CustomCarousel({ photos, onPhotoClick, activePhotoUrl }: CustomCarouselProps) {
+export function CustomCarousel({ photos, onPhotoClick, activeKey }: CustomCarouselProps) {
   const trackRef = React.useRef<HTMLDivElement>(null);
 
   const doublePhotos = React.useMemo(() => [...photos, ...photos], [photos]);
@@ -165,19 +165,20 @@ export function CustomCarousel({ photos, onPhotoClick, activePhotoUrl }: CustomC
           const originalIndex = idx % photos.length;
           const aspectRatio = photo.width / photo.height;
 
-          const isActive = photo.url === activePhotoUrl;
+          const key = `${photo.url}-${idx}`;
+          const isActive = key === activeKey;
 
           return (
             <motion.div
-              key={`${photo.url}-${idx}`}
+              key={key}
               initial={{ opacity: 0, y: -50 }}
               animate={{ opacity: isActive ? 0 : 1, y: 0 }}
               transition={{
-                duration: activePhotoUrl ? 0.3 : 0.65,
-                delay: activePhotoUrl ? 0 : idx * 0.12,
+                duration: activeKey ? 0.3 : 0.65,
+                delay: activeKey ? 0 : idx * 0.12,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              onClick={(e) => onPhotoClick?.(originalIndex, e.currentTarget.getBoundingClientRect())}
+              onClick={(e) => onPhotoClick?.(originalIndex, e.currentTarget.getBoundingClientRect(), key)}
               className="relative h-[52vh] sm:h-[60vh] lg:h-[66vh] shrink-0 cursor-pointer overflow-hidden rounded-sm"
               style={{ width: `calc(66vh * ${aspectRatio})` }}
             >
