@@ -1,7 +1,6 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "motion/react";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -9,6 +8,7 @@ import "swiper/css";
 import "swiper/css/mousewheel";
 import { Mousewheel, Navigation } from "swiper/modules";
 import 'swiper/css/navigation';
+import { Button } from "@/components/ui/button";
 
 const photos = [
   {
@@ -80,13 +80,7 @@ const AccordionPhotos = () => {
           );
         })}
       </Swiper>
-      <div className="w-full flex justify-center mt-10">
-        <Link href="/photography">
-          <Button className="text-lg px-8 py-6 rounded-full">
-            View all photography
-          </Button>
-        </Link>
-      </div>
+      <Link href="/photography"><Button>essa</Button></Link>
     </div>
   );
 };

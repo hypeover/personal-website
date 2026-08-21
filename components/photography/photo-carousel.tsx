@@ -1,13 +1,23 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import { AnimatePresence, easeOut, motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 
 import "lenis/dist/lenis.css";
-import { ReactLenis } from "lenis/react";
 
-import { CustomCarousel } from "./custom-carousel";
+import { PhotoCarouselView } from "./views/photo-carousel-view";
+import { PhotoGridView } from "./views/photo-grid-view";
+
+const PhotoMapView = dynamic(() => import("./views/photo-map-view"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-screen w-full items-center justify-center text-sm text-muted-foreground">
+      Loading map...
+    </div>
+  ),
+});
 
 const photos = [
   {
@@ -112,132 +122,43 @@ const photos = [
   },
 ];
 
-const PROJECTS = [
-  "All",
-  ...Array.from(new Set(photos.map((photo) => photo.location.country))),
-];
-
 function formatCoordinate(value: number, positiveSuffix: string, negativeSuffix: string) {
   return `${Math.abs(value).toFixed(4)}° ${value >= 0 ? positiveSuffix : negativeSuffix}`;
 }
 
-const MAX_SOURCE_HEIGHT = 1200;
-const MAX_EXPANDED_SOURCE_HEIGHT = 2000;
-
-function displaySize(width: number, height: number, maxHeight = MAX_SOURCE_HEIGHT) {
+function displaySize(width: number, height: number, maxHeight = 1200) {
   if (height <= maxHeight) return { width, height };
   const scale = maxHeight / height;
   return { width: Math.round(width * scale), height: maxHeight };
 }
 
-const MASONRY_ROW_UNIT = 4;
-const MASONRY_GAP = 12;
-
-type Photo = (typeof photos)[number];
-
-function MasonryTile({
-  photo,
-  onOpen,
-  priority,
-}: {
-  photo: Photo;
-  onOpen: () => void;
-  priority: boolean;
-}) {
-  const ref = React.useRef<HTMLDivElement>(null);
-  const [rowSpan, setRowSpan] = React.useState(1);
-  const size = displaySize(photo.width, photo.height);
-
-  const recalc = React.useCallback(() => {
-    if (!ref.current) return;
-    const height = ref.current.getBoundingClientRect().height;
-    setRowSpan(
-      Math.ceil((height + MASONRY_GAP) / (MASONRY_ROW_UNIT + MASONRY_GAP))
-    );
-  }, []);
-
-  React.useEffect(() => {
-    recalc();
-    window.addEventListener("resize", recalc);
-    return () => window.removeEventListener("resize", recalc);
-  }, [recalc]);
-
-  return (
-    <div
-      onClick={onOpen}
-      style={{ gridRowEnd: `span ${rowSpan}` }}
-      className="cursor-pointer overflow-hidden rounded-sm"
-    >
-      <div ref={ref}>
-        <Image
-          src={photo.url}
-          alt={photo.title}
-          width={size.width}
-          height={size.height}
-          sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-          className="h-auto w-full rounded-sm"
-          priority={priority}
-          onLoad={recalc}
-        />
-      </div>
-    </div>
-  );
-}
-
 export default function PhotoCarousel() {
   const [openIndex, setOpenIndex] = React.useState<number | null>(null);
   const [expandedLoaded, setExpandedLoaded] = React.useState(false);
-  const [activeProject, setActiveProject] = React.useState("All");
-  const [projectMenuOpen, setProjectMenuOpen] = React.useState(false);
-  const [viewMode, setViewMode] = React.useState<"carousel" | "grid">("carousel");
+  const [viewMode, setViewMode] = React.useState<"carousel" | "grid" | "map">("carousel");
 
-  // Zarządzanie stanem przewijania i blokada widocznego scrollbara
   React.useEffect(() => {
-    if (viewMode === "carousel") {
-      document.documentElement.style.overflow = "hidden";
-      document.body.style.overflow = "hidden";
-    } else {
+    if (viewMode === "grid") {
       document.documentElement.style.overflow = "auto";
       document.body.style.overflow = "auto";
+    } else {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
     }
   }, [viewMode]);
 
-  const switchViewMode = (mode: "carousel" | "grid") => {
+  const switchViewMode = (mode: "carousel" | "grid" | "map") => {
     setOpenIndex(null);
-    if (mode === "carousel") {
-      window.scrollTo(0, 0);
-    }
+    if (mode !== "grid") window.scrollTo(0, 0);
     setViewMode(mode);
-  };
-
-  const displayedPhotos =
-    activeProject === "All"
-      ? photos
-      : photos.filter((photo) => photo.location.country === activeProject);
-
-  const selectProject = (project: string) => {
-    setActiveProject(project);
-    setProjectMenuOpen(false);
-    setOpenIndex(null);
   };
 
   React.useEffect(() => {
     setExpandedLoaded(false);
   }, [openIndex]);
 
-  React.useEffect(() => {
-    if (openIndex === null) return;
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpenIndex(null);
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [openIndex]);
-
   return (
     <div className="relative w-full min-h-screen bg-background overflow-x-hidden">
-      {/* Globalne ukrycie wizualnych pasków przewijania (scroll działa bez przeszkód) */}
       <style dangerouslySetInnerHTML={{ __html: `
         html, body {
           scrollbar-width: none !important;
@@ -250,15 +171,16 @@ export default function PhotoCarousel() {
         }
       `}} />
 
-      {/* Switcher trybów */}
+      {/* Switcher trybów (Carousel / Grid / Map) */}
       <div className="fixed top-6 left-1/2 z-30 -translate-x-1/2">
         <div className="flex items-center gap-1 rounded-full border bg-background/80 backdrop-blur-md p-1 text-sm shadow-sm">
-          {(["carousel", "grid"] as const).map((mode) => (
+          {(["carousel", "grid", "map"] as const).map((mode) => (
             <button
               key={mode}
+              type="button"
               onClick={() => switchViewMode(mode)}
               aria-label={`Switch to ${mode} view`}
-              className={`relative rounded-full px-3 py-1 capitalize transition-colors ${
+              className={`relative rounded-full px-3.5 py-1 capitalize transition-colors ${
                 viewMode === mode
                   ? "text-background"
                   : "text-muted-foreground hover:text-foreground"
@@ -277,103 +199,29 @@ export default function PhotoCarousel() {
         </div>
       </div>
 
-      {/* Menu filtrów */}
-      <div className="fixed top-6 right-6 z-30">
-        <button
-          onClick={() => setProjectMenuOpen((open) => !open)}
-          className="flex items-center gap-1.5 text-sm font-medium bg-background/80 backdrop-blur-md px-3 py-1.5 rounded-full border shadow-sm"
-        >
-          {activeProject === "All" ? "Projects" : activeProject}
-          <motion.span
-            animate={{ rotate: projectMenuOpen ? 180 : 0 }}
-            transition={{ duration: 0.2, ease: easeOut }}
-            className="text-xs"
-          >
-            ▾
-          </motion.span>
-        </button>
-
-        <AnimatePresence>
-          {projectMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: easeOut }}
-              className="absolute top-full right-0 mt-2 min-w-32 rounded-sm border bg-background/95 py-1.5 shadow-md backdrop-blur-md"
-            >
-              {PROJECTS.map((project) => (
-                <button
-                  key={project}
-                  onClick={() => selectProject(project)}
-                  className={`block w-full px-4 py-1.5 text-left text-sm hover:bg-accent ${
-                    project === activeProject ? "font-medium" : "text-muted-foreground"
-                  }`}
-                >
-                  {project}
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {projectMenuOpen && (
-        <div
-          className="fixed inset-0 z-10"
-          onClick={() => setProjectMenuOpen(false)}
-        />
-      )}
-
-      {/* Treść z wykluczoną szarpnięciami animacją */}
+      {/* Przełącznik widoków */}
       <AnimatePresence mode="wait">
-        {viewMode === "carousel" ? (
-          <motion.div
-            key="carousel"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{
-              opacity: 0,
-              y: -30,
-              transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-            }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="flex h-screen w-full flex-col justify-center"
-          >
-            <CustomCarousel
-              photos={displayedPhotos}
-              onPhotoClick={(index) => setOpenIndex(index)}
-            />
-          </motion.div>
-        ) : (
-          <ReactLenis root key="grid-lenis">
-            <motion.div
-              key="grid"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{
-                opacity: 0,
-                y: 20,
-                transition: { duration: 0.3, ease: "easeOut" },
-              }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="grid grid-flow-dense grid-cols-2 gap-3 px-4 pt-24 pb-16 sm:grid-cols-3 sm:px-8 lg:grid-cols-4 xl:grid-cols-5"
-              style={{ gridAutoRows: MASONRY_ROW_UNIT }}
-            >
-              {displayedPhotos.map((photo, i) => (
-                <MasonryTile
-                  key={photo.url}
-                  photo={photo}
-                  onOpen={() => setOpenIndex(i)}
-                  priority={i < 4}
-                />
-              ))}
-            </motion.div>
-          </ReactLenis>
+        {viewMode === "carousel" && (
+          <PhotoCarouselView
+            photos={photos}
+            onPhotoClick={(i) => setOpenIndex(i)}
+          />
+        )}
+        {viewMode === "grid" && (
+          <PhotoGridView
+            photos={photos}
+            onPhotoClick={(i) => setOpenIndex(i)}
+          />
+        )}
+        {viewMode === "map" && (
+          <PhotoMapView
+            photos={photos}
+            onPhotoClick={(i) => setOpenIndex(i)}
+          />
         )}
       </AnimatePresence>
 
-      {/* Modal */}
+      {/* Modal ze szczegółami */}
       <AnimatePresence>
         {openIndex !== null && (
           <motion.div
@@ -381,26 +229,17 @@ export default function PhotoCarousel() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
             onClick={() => setOpenIndex(null)}
           >
             {(() => {
-              const photo = displayedPhotos[openIndex];
+              const photo = photos[openIndex];
               const placeholderSize = displaySize(photo.width, photo.height);
-              const fullSize = displaySize(
-                photo.width,
-                photo.height,
-                MAX_EXPANDED_SOURCE_HEIGHT
-              );
+              const fullSize = displaySize(photo.width, photo.height, 2000);
               const details = [
-                {
-                  label: "Location",
-                  value: `${photo.location.city}, ${photo.location.country}`,
-                },
+                { label: "Location", value: `${photo.location.city}, ${photo.location.country}` },
                 { label: "Date", value: photo.date },
-                {
-                  label: "Coordinates",
-                  value: `${formatCoordinate(photo.location.lat, "N", "S")}, ${formatCoordinate(photo.location.lon, "E", "W")}`,
-                },
+                { label: "Coordinates", value: `${formatCoordinate(photo.location.lat, "N", "S")}, ${formatCoordinate(photo.location.lon, "E", "W")}` },
                 { label: "Camera", value: photo.camera },
                 { label: "Lens", value: photo.lens },
               ];
@@ -408,52 +247,34 @@ export default function PhotoCarousel() {
               return (
                 <div className="flex flex-col items-center gap-8 lg:flex-row lg:items-center">
                   <motion.div
-                    initial="hidden"
-                    animate="visible"
-                    exit="hidden"
-                    variants={{
-                      visible: {
-                        transition: { delayChildren: 0.2, staggerChildren: 0.09 },
-                      },
-                    }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3, delay: 0.1 }}
                     onClick={(e) => e.stopPropagation()}
                     className="w-64 shrink-0 cursor-auto space-y-5 lg:w-56"
                   >
                     {details.map((detail) => (
-                      <motion.div
-                        key={detail.label}
-                        variants={{
-                          hidden: { opacity: 0, x: 28 },
-                          visible: {
-                            opacity: 1,
-                            x: 0,
-                            transition: { duration: 0.45, ease: easeOut },
-                          },
-                        }}
-                      >
+                      <div key={detail.label}>
                         <p className="text-xs tracking-wide text-muted-foreground uppercase">
                           {detail.label}
                         </p>
-                        <p className="mt-0.5 text-sm font-medium">
-                          {detail.value}
-                        </p>
-                      </motion.div>
+                        <p className="mt-0.5 text-sm font-medium">{detail.value}</p>
+                      </div>
                     ))}
                   </motion.div>
 
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.3, ease: easeOut }}
-                    className="relative h-[70vh] lg:h-[85vh]"
+                    layoutId={`photo-${photo.url}-${openIndex}`}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="relative h-[70vh] lg:h-[85vh] overflow-hidden rounded-sm"
                   >
                     <Image
                       src={photo.url}
                       alt={photo.title}
                       width={placeholderSize.width}
                       height={placeholderSize.height}
-                      className="h-full w-auto rounded-sm"
+                      className="h-full w-auto rounded-sm object-cover"
                       priority
                     />
                     <Image

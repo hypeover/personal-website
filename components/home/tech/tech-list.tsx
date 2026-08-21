@@ -5,16 +5,19 @@ import {
   TypescriptIconIcon,
   NextjsIconIcon,
   PythonIcon,
+  FastapiIconIcon,
+  PlaywrightIcon,
   ShadcnuiIcon,
   RadixuiIcon,
   ReactRouterIcon,
   GitIconIcon,
   GooglegeminiIcon,
+  ClaudeIconIcon,
   SupabaseIconIcon,
+  PostgresqlIcon,
   PostmanIconIcon,
   JiraIcon,
   XrayForJiraIcon,
-  PlaywrightIcon,
   FlutterIcon,
 } from "./icons";
 
@@ -51,6 +54,11 @@ export const TechList = [
     link: "https://www.python.org/",
   },
   {
+    name: "FastAPI",
+    icon: FastapiIconIcon,
+    link: "https://fastapi.tiangolo.com/",
+  },
+  {
     name: "ShadcnUI",
     icon: ShadcnuiIcon,
     link: "https://www.shadcn.io/",
@@ -76,9 +84,19 @@ export const TechList = [
     link: "https://gemini.google.com/",
   },
   {
+    name: "Claude",
+    icon: ClaudeIconIcon,
+    link: "https://claude.ai/",
+  },
+  {
     name: "Supabase",
     icon: SupabaseIconIcon,
     link: "https://supabase.com/",
+  },
+  {
+    name: "PostgreSQL",
+    icon: PostgresqlIcon,
+    link: "https://www.postgresql.org/",
   },
   {
     name: "Postman",

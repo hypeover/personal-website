@@ -127,6 +127,30 @@
   html {
     @apply font-sans;
   }
+  .maplibregl-popup-content {
+    @apply bg-transparent! shadow-none! p-0! rounded-none!;
+  }
+  .maplibregl-popup-tip {
+    @apply hidden!;
+  }
+  .maplibregl-ctrl-attrib {
+    @apply bg-background! text-muted-foreground! border-border! rounded-md! border! shadow-sm!;
+  }
+  .maplibregl-ctrl-attrib a {
+    @apply text-muted-foreground!;
+  }
+  .maplibregl-ctrl-attrib a:hover {
+    @apply text-foreground!;
+  }
+  .maplibregl-ctrl-attrib-button {
+    @apply bg-transparent! dark:invert;
+  }
+  .mapboxgl-popup-content, .maplibregl-popup-content {
+    @apply bg-transparent! shadow-none! p-0! rounded-none!;
+  }
+  .mapboxgl-popup-tip, .maplibregl-popup-tip {
+    @apply hidden!;
+  }
 }
 
 ::view-transition-old(root),
@@ -144,4 +168,19 @@
 
 .swiper-wrapper {
   transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+@keyframes glow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.03);
+  }
+}
+
+@utility animate-glow {
+  animation: glow 8s ease-in-out infinite;
 }
